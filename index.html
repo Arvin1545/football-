@@ -26,73 +26,102 @@
         <p class="game-subtitle">بهترین تجربه مدیریت فوتبال</p>
       </div>
 
-      <!-- تب‌های ورود / ثبت‌نام -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">ورود</button>
-        <button class="auth-tab" data-tab="signup">ثبت‌نام</button>
-      </div>
-
       <div class="login-body">
-        
-        <!-- فرم ورود -->
-        <form id="loginForm" class="auth-form">
-          <h2>خوش برگشتی، مدیر! 👋</h2>
-          <p class="login-desc">با ایمیل و رمزت وارد شو</p>
 
-          <div class="input-group">
-            <span class="input-icon">📧</span>
-            <input type="email" id="loginEmail" placeholder="ایمیل" required autocomplete="email">
+        <!-- ============================================
+             صفحه ۱: انتخاب (قبلاً بازی کردی؟)
+             ============================================ -->
+        <div id="welcomeStep" class="auth-step">
+          <h2>خوش آمدی، مدیر! 👋</h2>
+          <p class="login-desc">قبلاً تو این بازی اکانت داشتی؟</p>
+
+          <div class="choice-buttons">
+            <button class="choice-btn choice-yes" id="hasAccountBtn" type="button">
+              <span class="choice-icon">✅</span>
+              <div class="choice-text">
+                <strong>بله، اکانت دارم</strong>
+                <small>با ایمیل و رمز وارد شو</small>
+              </div>
+            </button>
+
+            <button class="choice-btn choice-no" id="noAccountBtn" type="button">
+              <span class="choice-icon">🆕</span>
+              <div class="choice-text">
+                <strong>نه، تازه‌ام</strong>
+                <small>اکانت جدید بساز</small>
+              </div>
+            </button>
           </div>
 
-          <div class="input-group">
-            <span class="input-icon">🔒</span>
-            <input type="password" id="loginPassword" placeholder="رمز عبور" required autocomplete="current-password" minlength="6">
+          <div class="divider">
+            <span>یا</span>
           </div>
 
-          <button type="submit" class="primary-btn">
-            <span>ورود به بازی</span>
+          <button id="guestLoginBtn" class="social-btn guest-btn" type="button">
+            <span class="guest-icon">👤</span>
+            <span>بازی سریع به عنوان مهمان</span>
           </button>
-        </form>
 
-        <!-- فرم ثبت‌نام -->
-        <form id="signupForm" class="auth-form" style="display: none;">
-          <h2>خوش آمدی، مدیر جدید! ⚽</h2>
-          <p class="login-desc">اکانت بساز تا پیشرفتت ذخیره بمونه</p>
-
-          <div class="input-group">
-            <span class="input-icon">👤</span>
-            <input type="text" id="signupName" placeholder="اسم مدیر" required minlength="2" maxlength="30">
+          <div class="guest-warning">
+            ⚠️ پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه.
           </div>
-
-          <div class="input-group">
-            <span class="input-icon">📧</span>
-            <input type="email" id="signupEmail" placeholder="ایمیل" required autocomplete="email">
-          </div>
-
-          <div class="input-group">
-            <span class="input-icon">🔒</span>
-            <input type="password" id="signupPassword" placeholder="رمز عبور (حداقل ۶ حرف)" required autocomplete="new-password" minlength="6">
-          </div>
-
-          <button type="submit" class="primary-btn">
-            <span>ساخت اکانت</span>
-          </button>
-        </form>
-
-        <!-- جداکننده -->
-        <div class="divider">
-          <span>یا</span>
         </div>
 
-        <!-- دکمه مهمان -->
-        <button id="guestLoginBtn" class="social-btn guest-btn" type="button">
-          <span class="guest-icon">👤</span>
-          <span>بازی به عنوان مهمان</span>
-        </button>
+        <!-- ============================================
+             صفحه ۲: ثبت‌نام
+             ============================================ -->
+        <div id="signupStep" class="auth-step" style="display: none;">
+          <button class="back-btn" id="backFromSignup" type="button">→ بازگشت</button>
+          
+          <h2>ساخت اکانت جدید ⚽</h2>
+          <p class="login-desc">اطلاعاتت رو وارد کن</p>
 
-        <!-- هشدار مهمان -->
-        <div class="guest-warning">
-          ⚠️ پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه. برای ذخیره دائمی، اکانت بساز!
+          <form id="signupForm" class="auth-form">
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="signupName" placeholder="اسم مدیر" required minlength="2" maxlength="30">
+            </div>
+
+            <div class="input-group">
+              <span class="input-icon">📧</span>
+              <input type="email" id="signupEmail" placeholder="ایمیل" required autocomplete="email">
+            </div>
+
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="signupPassword" placeholder="رمز عبور (حداقل ۶ حرف)" required autocomplete="new-password" minlength="6">
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <span>ساخت اکانت</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ============================================
+             صفحه ۳: ورود
+             ============================================ -->
+        <div id="loginStep" class="auth-step" style="display: none;">
+          <button class="back-btn" id="backFromLogin" type="button">→ بازگشت</button>
+          
+          <h2>خوش برگشتی! 👋</h2>
+          <p class="login-desc">با ایمیل و رمزت وارد شو</p>
+
+          <form id="loginForm" class="auth-form">
+            <div class="input-group">
+              <span class="input-icon">📧</span>
+              <input type="email" id="loginEmail" placeholder="ایمیل" required autocomplete="email">
+            </div>
+
+            <div class="input-group">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="loginPassword" placeholder="رمز عبور" required autocomplete="current-password" minlength="6">
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <span>ورود به بازی</span>
+            </button>
+          </form>
         </div>
 
         <div id="errorMessage" class="error-message" role="alert"></div>
