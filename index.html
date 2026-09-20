@@ -38,7 +38,7 @@
               <span class="choice-icon">✅</span>
               <div class="choice-text">
                 <strong>بله، اکانت دارم</strong>
-                <small>با ایمیل و رمز وارد شو</small>
+                <small>با یوزرنیم و رمز وارد شو</small>
               </div>
             </button>
 
@@ -71,12 +71,12 @@
           <form id="signupForm" class="auth-form">
             <div class="input-group">
               <span class="input-icon">👤</span>
-              <input type="text" id="signupName" placeholder="اسم مدیر" required minlength="2" maxlength="30">
+              <input type="text" id="signupName" placeholder="اسم نمایشی (مثلاً: علی رضایی)" required minlength="2" maxlength="30">
             </div>
 
             <div class="input-group">
-              <span class="input-icon">📧</span>
-              <input type="email" id="signupEmail" placeholder="ایمیل" required autocomplete="email">
+              <span class="input-icon">🆔</span>
+              <input type="text" id="signupUsername" placeholder="یوزرنیم (انگلیسی، مثلاً: ali_2024)" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
             </div>
 
             <div class="input-group">
@@ -87,6 +87,10 @@
             <button type="submit" class="primary-btn">
               <span>ساخت اکانت</span>
             </button>
+
+            <p class="input-hint">
+              💡 یوزرنیم فقط می‌تونه شامل حروف انگلیسی، عدد و آندرلاین باشه
+            </p>
           </form>
         </div>
 
@@ -95,12 +99,12 @@
           <button class="back-btn" id="backFromLogin" type="button">→ بازگشت</button>
           
           <h2>خوش برگشتی! 👋</h2>
-          <p class="login-desc">با ایمیل و رمزت وارد شو</p>
+          <p class="login-desc">با یوزرنیم و رمزت وارد شو</p>
 
           <form id="loginForm" class="auth-form">
             <div class="input-group">
-              <span class="input-icon">📧</span>
-              <input type="email" id="loginEmail" placeholder="ایمیل" required autocomplete="email">
+              <span class="input-icon">🆔</span>
+              <input type="text" id="loginUsername" placeholder="یوزرنیم" required autocomplete="username">
             </div>
 
             <div class="input-group">
@@ -124,7 +128,7 @@
           <form id="guestForm" class="auth-form">
             <div class="input-group">
               <span class="input-icon">👤</span>
-              <input type="text" id="guestName" placeholder="اسم مدیر (مثلاً: علی)" required minlength="2" maxlength="20">
+              <input type="text" id="guestName" placeholder="اسمت (مثلاً: علی)" required minlength="2" maxlength="20">
             </div>
 
             <button type="submit" class="primary-btn">
