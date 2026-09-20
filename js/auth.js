@@ -1,5 +1,5 @@
 // auth.js
-// مدیریت احراز هویت: ثبت‌نام + ورود + مهمان
+// مدیریت احراز هویت با Username
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
@@ -22,9 +22,9 @@ const els = {
   guestForm: document.getElementById('guestForm'),
   
   signupName: document.getElementById('signupName'),
-  signupEmail: document.getElementById('signupEmail'),
+  signupUsername: document.getElementById('signupUsername'),
   signupPassword: document.getElementById('signupPassword'),
-  loginEmail: document.getElementById('loginEmail'),
+  loginUsername: document.getElementById('loginUsername'),
   loginPassword: document.getElementById('loginPassword'),
   guestName: document.getElementById('guestName'),
   
@@ -33,6 +33,16 @@ const els = {
   loadingOverlay: document.getElementById('loadingOverlay'),
   loadingText: document.getElementById('loadingText')
 };
+
+// دامنه جعلی برای Auth
+const FAKE_DOMAIN = 'football-manager.local';
+
+// ====================================================
+// ساخت ایمیل جعلی از یوزرنیم
+// ====================================================
+function usernameToEmail(username) {
+  return `${username.toLowerCase()}@${FAKE_DOMAIN}`;
+}
 
 // ====================================================
 // مدیریت صفحه‌ها
@@ -82,29 +92,35 @@ function clearMessages() {
 function translateError(error) {
   const msg = error?.message || '';
   
-  if (msg.includes('Invalid login credentials')) return 'ایمیل یا رمز عبور اشتباهه';
-  if (msg.includes('Email not confirmed')) return 'ایمیلت تأیید نشده';
+  if (msg.includes('Invalid login credentials')) return 'یوزرنیم یا رمز عبور اشتباهه';
+  if (msg.includes('User already registered')) return 'این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن.';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
-  if (msg.includes('Unable to validate email')) return 'ایمیل معتبر نیست';
   if (msg.includes('rate limit')) return 'درخواست‌های زیاد. یه دقیقه صبر کن.';
   if (msg.includes('network')) return 'مشکل اتصال اینترنت';
+  if (msg.includes('duplicate key') || msg.includes('unique constraint')) return 'این یوزرنیم قبلاً گرفته شده';
   
   return msg || 'خطای نامشخص. دوباره تلاش کن.';
 }
 
 // ====================================================
-// ثبت‌نام — هر ایمیل می‌تونه چند اکانت بسازه
+// ثبت‌نام
 // ====================================================
 els.signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
   
   const name = els.signupName.value.trim();
-  const email = els.signupEmail.value.trim();
+  const username = els.signupUsername.value.trim().toLowerCase();
   const password = els.signupPassword.value;
   
-  if (!name || !email || !password) {
+  if (!name || !username || !password) {
     showError('همه فیلدها رو پر کن');
+    return;
+  }
+  
+  // اعتبارسنجی یوزرنیم
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) {
+    showError('یوزرنیم باید بین ۳ تا ۲۰ حرف، فقط انگلیسی، عدد یا _ باشه');
     return;
   }
   
@@ -117,21 +133,31 @@ els.signupForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ساخت اکانت...';
     els.loadingOverlay.hidden = false;
     
-    // ⚠️ مهم: برای اینکه هر ایمیل بتونه چند اکانت بسازه،
-    // یه ایمیل یکتا برای Supabase Auth می‌سازیم
-    // ولی ایمیل اصلی رو توی پروفایل نگه می‌داریم
-    const uniqueId = Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-    const [emailUser, emailDomain] = email.split('@');
-    const authEmail = `${emailUser}+${uniqueId}@${emailDomain}`;
+    // چک کن یوزرنیم تکراری نباشه
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .ilike('username', username)
+      .maybeSingle();
     
-    const { data, error} = await supabase.auth.signUp({
-      email: authEmail,
+    if (existingUser) {
+      els.loadingOverlay.hidden = true;
+      showError('این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن.');
+      return;
+    }
+    
+    // ایمیل جعلی بساز
+    const fakeEmail = usernameToEmail(username);
+    
+    // ثبت‌نام
+    const { data, error } = await supabase.auth.signUp({
+      email: fakeEmail,
       password,
       options: {
         data: {
           full_name: name,
           display_name: name,
-          real_email: email  // ایمیل اصلی اینجا ذخیره می‌شه
+          username: username
         }
       }
     });
@@ -147,17 +173,23 @@ els.signupForm.addEventListener('submit', async (e) => {
         .maybeSingle();
       
       if (!existingProfile) {
-        await supabase
+        const { error: insertError } = await supabase
           .from('profiles')
           .insert({
             id: data.user.id,
-            email: email,           // ایمیل اصلی که کاربر داد
+            email: fakeEmail,
             display_name: name,
+            username: username,
             is_guest: false,
             coins: 1000,
             gems: 50,
             level: 1
           });
+        
+        if (insertError) {
+          console.error('خطا در ساخت پروفایل:', insertError);
+          throw new Error('خطا در ساخت پروفایل');
+        }
       }
     }
     
@@ -180,11 +212,11 @@ els.loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
   
-  const email = els.loginEmail.value.trim();
+  const username = els.loginUsername.value.trim().toLowerCase();
   const password = els.loginPassword.value;
   
-  if (!email || !password) {
-    showError('ایمیل و رمز عبور رو پر کن');
+  if (!username || !password) {
+    showError('یوزرنیم و رمز عبور رو پر کن');
     return;
   }
   
@@ -192,20 +224,11 @@ els.loginForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ورود...';
     els.loadingOverlay.hidden = false;
     
-    // ⚠️ مشکل: چون ایمیل اصلی چند اکانت داره، 
-    // نمی‌تونیم مستقیم بگیم کدومه.
-    // راه‌حل: از ایمیل بدون + استفاده می‌کنیم ولی Supabase 
-    // ایمیل‌های +دار رو جدا می‌بینه.
-    // 
-    // فعلاً: کاربر باید دقیقاً همون ایمیل + رمزی که ثبت‌نام کرده رو وارد کنه.
-    // ولی چون ما +uniqueId اضافه کردیم، کاربر نمی‌تونه وارد شه.
-    // 
-    // راه‌حل نهایی: از ایمیل‌های ترکیبی استفاده نکنیم و 
-    // به جای اون از uniqueUsername استفاده کنیم.
+    // ایمیل جعلی بساز
+    const fakeEmail = usernameToEmail(username);
     
-    // فعلاً ساده: کاربر با ایمیل اصلی وارد شه
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: fakeEmail,
       password
     });
     
@@ -224,7 +247,7 @@ els.loginForm.addEventListener('submit', async (e) => {
 });
 
 // ====================================================
-// مهمان
+// ورود مهمان
 // ====================================================
 els.guestForm.addEventListener('submit', async (e) => {
   e.preventDefault();
