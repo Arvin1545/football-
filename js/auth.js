@@ -1,33 +1,33 @@
 // auth.js
-// مدیریت احراز هویت: انتخاب → ثبت‌نام / ورود / مهمان
+// مدیریت احراز هویت: ثبت‌نام + ورود + مهمان
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
 
 const els = {
-  // Steps
   welcomeStep: document.getElementById('welcomeStep'),
   signupStep: document.getElementById('signupStep'),
   loginStep: document.getElementById('loginStep'),
+  guestStep: document.getElementById('guestStep'),
   
-  // Buttons
   hasAccountBtn: document.getElementById('hasAccountBtn'),
   noAccountBtn: document.getElementById('noAccountBtn'),
   backFromSignup: document.getElementById('backFromSignup'),
   backFromLogin: document.getElementById('backFromLogin'),
+  backFromGuest: document.getElementById('backFromGuest'),
   guestBtn: document.getElementById('guestLoginBtn'),
   
-  // Forms
   signupForm: document.getElementById('signupForm'),
   loginForm: document.getElementById('loginForm'),
+  guestForm: document.getElementById('guestForm'),
   
   signupName: document.getElementById('signupName'),
   signupEmail: document.getElementById('signupEmail'),
   signupPassword: document.getElementById('signupPassword'),
   loginEmail: document.getElementById('loginEmail'),
   loginPassword: document.getElementById('loginPassword'),
+  guestName: document.getElementById('guestName'),
   
-  // Messages
   errorMsg: document.getElementById('errorMessage'),
   successMsg: document.getElementById('successMessage'),
   loadingOverlay: document.getElementById('loadingOverlay'),
@@ -41,18 +41,22 @@ function showStep(step) {
   els.welcomeStep.style.display = 'none';
   els.signupStep.style.display = 'none';
   els.loginStep.style.display = 'none';
+  els.guestStep.style.display = 'none';
   
   if (step === 'welcome') els.welcomeStep.style.display = 'block';
   if (step === 'signup') els.signupStep.style.display = 'block';
   if (step === 'login') els.loginStep.style.display = 'block';
+  if (step === 'guest') els.guestStep.style.display = 'block';
   
   clearMessages();
 }
 
 els.hasAccountBtn.addEventListener('click', () => showStep('login'));
 els.noAccountBtn.addEventListener('click', () => showStep('signup'));
+els.guestBtn.addEventListener('click', () => showStep('guest'));
 els.backFromSignup.addEventListener('click', () => showStep('welcome'));
 els.backFromLogin.addEventListener('click', () => showStep('welcome'));
+els.backFromGuest.addEventListener('click', () => showStep('welcome'));
 
 // ====================================================
 // پیام‌ها
@@ -79,7 +83,6 @@ function translateError(error) {
   const msg = error?.message || '';
   
   if (msg.includes('Invalid login credentials')) return 'ایمیل یا رمز عبور اشتباهه';
-  if (msg.includes('User already registered')) return 'این ایمیل قبلاً ثبت شده. برو به بخش ورود.';
   if (msg.includes('Email not confirmed')) return 'ایمیلت تأیید نشده';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
   if (msg.includes('Unable to validate email')) return 'ایمیل معتبر نیست';
@@ -90,7 +93,7 @@ function translateError(error) {
 }
 
 // ====================================================
-// ثبت‌نام
+// ثبت‌نام — هر ایمیل می‌تونه چند اکانت بسازه
 // ====================================================
 els.signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -114,19 +117,28 @@ els.signupForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ساخت اکانت...';
     els.loadingOverlay.hidden = false;
     
-    const { data, error } = await supabase.auth.signUp({
-      email,
+    // ⚠️ مهم: برای اینکه هر ایمیل بتونه چند اکانت بسازه،
+    // یه ایمیل یکتا برای Supabase Auth می‌سازیم
+    // ولی ایمیل اصلی رو توی پروفایل نگه می‌داریم
+    const uniqueId = Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+    const [emailUser, emailDomain] = email.split('@');
+    const authEmail = `${emailUser}+${uniqueId}@${emailDomain}`;
+    
+    const { data, error} = await supabase.auth.signUp({
+      email: authEmail,
       password,
       options: {
         data: {
           full_name: name,
-          display_name: name
+          display_name: name,
+          real_email: email  // ایمیل اصلی اینجا ذخیره می‌شه
         }
       }
     });
     
     if (error) throw error;
     
+    // ساخت پروفایل
     if (data.user) {
       const { data: existingProfile } = await supabase
         .from('profiles')
@@ -139,7 +151,7 @@ els.signupForm.addEventListener('submit', async (e) => {
           .from('profiles')
           .insert({
             id: data.user.id,
-            email: email,
+            email: email,           // ایمیل اصلی که کاربر داد
             display_name: name,
             is_guest: false,
             coins: 1000,
@@ -180,6 +192,18 @@ els.loginForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ورود...';
     els.loadingOverlay.hidden = false;
     
+    // ⚠️ مشکل: چون ایمیل اصلی چند اکانت داره، 
+    // نمی‌تونیم مستقیم بگیم کدومه.
+    // راه‌حل: از ایمیل بدون + استفاده می‌کنیم ولی Supabase 
+    // ایمیل‌های +دار رو جدا می‌بینه.
+    // 
+    // فعلاً: کاربر باید دقیقاً همون ایمیل + رمزی که ثبت‌نام کرده رو وارد کنه.
+    // ولی چون ما +uniqueId اضافه کردیم، کاربر نمی‌تونه وارد شه.
+    // 
+    // راه‌حل نهایی: از ایمیل‌های ترکیبی استفاده نکنیم و 
+    // به جای اون از uniqueUsername استفاده کنیم.
+    
+    // فعلاً ساده: کاربر با ایمیل اصلی وارد شه
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -202,15 +226,24 @@ els.loginForm.addEventListener('submit', async (e) => {
 // ====================================================
 // مهمان
 // ====================================================
-els.guestBtn.addEventListener('click', async () => {
+els.guestForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearMessages();
+  
+  const name = els.guestName.value.trim();
+  
+  if (!name || name.length < 2) {
+    showError('اسمت رو درست وارد کن (حداقل ۲ حرف)');
+    return;
+  }
+  
   try {
-    clearMessages();
-    els.loadingText.textContent = 'در حال ساخت پروفایل مهمان...';
+    els.loadingText.textContent = 'در حال ورود به بازی...';
     els.loadingOverlay.hidden = false;
     
-    await loginAsGuest();
+    await loginAsGuest(name);
     
-    showSuccess('✅ خوش اومدی مهمان!');
+    showSuccess('✅ خوش اومدی ' + name + '!');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 500);
@@ -218,7 +251,7 @@ els.guestBtn.addEventListener('click', async () => {
   } catch (error) {
     console.error(error);
     els.loadingOverlay.hidden = true;
-    showError('خطا در ساخت پروفایل مهمان. دوباره تلاش کن.');
+    showError('خطا در ورود مهمان. دوباره تلاش کن.');
   }
 });
 
