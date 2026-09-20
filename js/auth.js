@@ -1,19 +1,33 @@
 // auth.js
-// مدیریت احراز هویت: ایمیل + مهمان
+// مدیریت احراز هویت: انتخاب → ثبت‌نام / ورود / مهمان
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
 
 const els = {
-  tabs: document.querySelectorAll('.auth-tab'),
-  loginForm: document.getElementById('loginForm'),
+  // Steps
+  welcomeStep: document.getElementById('welcomeStep'),
+  signupStep: document.getElementById('signupStep'),
+  loginStep: document.getElementById('loginStep'),
+  
+  // Buttons
+  hasAccountBtn: document.getElementById('hasAccountBtn'),
+  noAccountBtn: document.getElementById('noAccountBtn'),
+  backFromSignup: document.getElementById('backFromSignup'),
+  backFromLogin: document.getElementById('backFromLogin'),
+  guestBtn: document.getElementById('guestLoginBtn'),
+  
+  // Forms
   signupForm: document.getElementById('signupForm'),
-  loginEmail: document.getElementById('loginEmail'),
-  loginPassword: document.getElementById('loginPassword'),
+  loginForm: document.getElementById('loginForm'),
+  
   signupName: document.getElementById('signupName'),
   signupEmail: document.getElementById('signupEmail'),
   signupPassword: document.getElementById('signupPassword'),
-  guestBtn: document.getElementById('guestLoginBtn'),
+  loginEmail: document.getElementById('loginEmail'),
+  loginPassword: document.getElementById('loginPassword'),
+  
+  // Messages
   errorMsg: document.getElementById('errorMessage'),
   successMsg: document.getElementById('successMessage'),
   loadingOverlay: document.getElementById('loadingOverlay'),
@@ -21,26 +35,24 @@ const els = {
 };
 
 // ====================================================
-// تب‌ها (ورود / ثبت‌نام)
+// مدیریت صفحه‌ها
 // ====================================================
-els.tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const tabName = tab.dataset.tab;
-    
-    els.tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    
-    if (tabName === 'login') {
-      els.loginForm.style.display = 'block';
-      els.signupForm.style.display = 'none';
-    } else {
-      els.loginForm.style.display = 'none';
-      els.signupForm.style.display = 'block';
-    }
-    
-    clearMessages();
-  });
-});
+function showStep(step) {
+  els.welcomeStep.style.display = 'none';
+  els.signupStep.style.display = 'none';
+  els.loginStep.style.display = 'none';
+  
+  if (step === 'welcome') els.welcomeStep.style.display = 'block';
+  if (step === 'signup') els.signupStep.style.display = 'block';
+  if (step === 'login') els.loginStep.style.display = 'block';
+  
+  clearMessages();
+}
+
+els.hasAccountBtn.addEventListener('click', () => showStep('login'));
+els.noAccountBtn.addEventListener('click', () => showStep('signup'));
+els.backFromSignup.addEventListener('click', () => showStep('welcome'));
+els.backFromLogin.addEventListener('click', () => showStep('welcome'));
 
 // ====================================================
 // پیام‌ها
@@ -67,7 +79,7 @@ function translateError(error) {
   const msg = error?.message || '';
   
   if (msg.includes('Invalid login credentials')) return 'ایمیل یا رمز عبور اشتباهه';
-  if (msg.includes('User already registered')) return 'این ایمیل قبلاً ثبت شده. وارد شو.';
+  if (msg.includes('User already registered')) return 'این ایمیل قبلاً ثبت شده. برو به بخش ورود.';
   if (msg.includes('Email not confirmed')) return 'ایمیلت تأیید نشده';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
   if (msg.includes('Unable to validate email')) return 'ایمیل معتبر نیست';
@@ -78,7 +90,79 @@ function translateError(error) {
 }
 
 // ====================================================
-// ورود با ایمیل
+// ثبت‌نام
+// ====================================================
+els.signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearMessages();
+  
+  const name = els.signupName.value.trim();
+  const email = els.signupEmail.value.trim();
+  const password = els.signupPassword.value;
+  
+  if (!name || !email || !password) {
+    showError('همه فیلدها رو پر کن');
+    return;
+  }
+  
+  if (password.length < 6) {
+    showError('رمز باید حداقل ۶ حرف باشه');
+    return;
+  }
+  
+  try {
+    els.loadingText.textContent = 'در حال ساخت اکانت...';
+    els.loadingOverlay.hidden = false;
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          display_name: name
+        }
+      }
+    });
+    
+    if (error) throw error;
+    
+    if (data.user) {
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      
+      if (!existingProfile) {
+        await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: email,
+            display_name: name,
+            is_guest: false,
+            coins: 1000,
+            gems: 50,
+            level: 1
+          });
+      }
+    }
+    
+    showSuccess('🎉 اکانت ساخته شد! در حال انتقال...');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 800);
+    
+  } catch (error) {
+    console.error(error);
+    els.loadingOverlay.hidden = true;
+    showError(translateError(error));
+  }
+});
+
+// ====================================================
+// ورود
 // ====================================================
 els.loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -116,80 +200,7 @@ els.loginForm.addEventListener('submit', async (e) => {
 });
 
 // ====================================================
-// ثبت‌نام با ایمیل
-// ====================================================
-els.signupForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  clearMessages();
-  
-  const name = els.signupName.value.trim();
-  const email = els.signupEmail.value.trim();
-  const password = els.signupPassword.value;
-  
-  if (!name || !email || !password) {
-    showError('همه فیلدها رو پر کن');
-    return;
-  }
-  
-  if (password.length < 6) {
-    showError('رمز باید حداقل ۶ حرف باشه');
-    return;
-  }
-  
-  try {
-    els.loadingText.textContent = 'در حال ساخت اکانت...';
-    els.loadingOverlay.hidden = false;
-    
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name,
-          display_name: name
-        }
-      }
-    });
-    
-    if (error) throw error;
-    
-    // اگه کاربر تازه ثبت‌نام کرد، پروفایل بساز
-    if (data.user) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      
-      if (!existingProfile) {
-        await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: email,
-            display_name: name,
-            is_guest: false,
-            coins: 1000,
-            gems: 50,
-            level: 1
-          });
-      }
-    }
-    
-    showSuccess('🎉 اکانت ساخته شد! در حال انتقال...');
-    setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 800);
-    
-  } catch (error) {
-    console.error(error);
-    els.loadingOverlay.hidden = true;
-    showError(translateError(error));
-  }
-});
-
-// ====================================================
-// ورود مهمان
+// مهمان
 // ====================================================
 els.guestBtn.addEventListener('click', async () => {
   try {
