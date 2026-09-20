@@ -3,59 +3,45 @@
 
 import { supabase } from './supabase-client.js';
 
-const GUEST_KEY = 'football_manager_guest_id';
+const GUEST_KEY = 'fm_guest_id';
 
-// ====================================================
-// شناسه مهمان
-// ====================================================
+// گرفتن یا ساخت شناسه مهمان
 export function getGuestId() {
   let guestId = localStorage.getItem(GUEST_KEY);
-  
   if (!guestId) {
-    guestId = crypto.randomUUID();
+    guestId = 'guest_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
     localStorage.setItem(GUEST_KEY, guestId);
-    console.log('🆕 شناسه مهمان جدید:', guestId);
   }
-  
   return guestId;
-}
-
-export function isGuest() {
-  return localStorage.getItem(GUEST_KEY) !== null;
 }
 
 export function clearGuestId() {
   localStorage.removeItem(GUEST_KEY);
 }
 
-// ====================================================
 // ورود مهمان با اسم
-// ====================================================
 export async function loginAsGuest(name) {
-  if (!name || name.trim().length < 2) {
-    throw new Error('اسم معتبر نیست');
+  const cleanName = (name || '').trim();
+  
+  if (cleanName.length < 2) {
+    throw new Error('اسم باید حداقل ۲ حرف باشه');
   }
   
-  const guestId = getGuestId();
-  const cleanName = name.trim();
+  const deviceId = getGuestId();
   
-  console.log('🎮 ورود مهمان:', cleanName);
+  console.log('🎮 ورود مهمان:', cleanName, '| device:', deviceId);
   
   // چک کن قبلاً مهمان بوده؟
-  const { data: existing, error: checkError } = await supabase
+  const { data: existing } = await supabase
     .from('profiles')
     .select('*')
-    .eq('device_id', guestId)
+    .eq('device_id', deviceId)
     .eq('is_guest', true)
     .maybeSingle();
   
-  if (checkError) {
-    console.error('خطا در چک مهمان:', checkError);
-  }
-  
   if (existing) {
-    // آپدیت
-    const { error: updateError } = await supabase
+    console.log('✅ مهمان قبلی پیدا شد');
+    await supabase
       .from('profiles')
       .update({ 
         display_name: cleanName,
@@ -63,60 +49,45 @@ export async function loginAsGuest(name) {
       })
       .eq('id', existing.id);
     
-    if (updateError) console.error('خطا در آپدیت:', updateError);
-    
-    console.log('✅ مهمان قبلی آپدیت شد');
     return { ...existing, display_name: cleanName };
   }
   
   // ساخت مهمان جدید
-  const guestProfile = {
-    id: crypto.randomUUID(),
-    email: null,
-    display_name: cleanName,
-    username: null,
-    avatar_url: null,
-    device_id: guestId,
-    is_guest: true,
-    coins: 1000,
-    gems: 50,
-    level: 1
-  };
+  console.log('🆕 ساخت مهمان جدید...');
   
-  const { data: created, error: createError } = await supabase
+  const { data: created, error } = await supabase
     .from('profiles')
-    .insert(guestProfile)
+    .insert({
+      display_name: cleanName,
+      device_id: deviceId,
+      is_guest: true,
+      coins: 1000,
+      gems: 50,
+      level: 1
+    })
     .select()
     .single();
   
-  if (createError) {
-    console.error('خطا در ساخت مهمان:', createError);
-    throw createError;
+  if (error) {
+    console.error('❌ خطا:', error);
+    throw error;
   }
   
-  console.log('✅ مهمان جدید ساخته شد:', created.id);
+  console.log('✅ مهمان ساخته شد:', created.id);
   return created;
 }
 
-// ====================================================
 // گرفتن پروفایل مهمان فعلی
-// ====================================================
 export async function getCurrentGuestProfile() {
-  const guestId = localStorage.getItem(GUEST_KEY);
+  const deviceId = localStorage.getItem(GUEST_KEY);
+  if (!deviceId) return null;
   
-  if (!guestId) return null;
-  
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('profiles')
     .select('*')
-    .eq('device_id', guestId)
+    .eq('device_id', deviceId)
     .eq('is_guest', true)
     .maybeSingle();
-  
-  if (error) {
-    console.error('خطا:', error);
-    return null;
-  }
   
   return data;
 }
