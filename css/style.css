@@ -762,3 +762,15 @@ body {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
    }
+/* راهنمای زیر فیلد */
+.input-hint {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(41, 121, 255, 0.08);
+  border: 1px solid rgba(41, 121, 255, 0.2);
+  border-radius: 10px;
+  font-size: 11.5px;
+  color: #5e9eff;
+  line-height: 1.6;
+  text-align: right;
+}
