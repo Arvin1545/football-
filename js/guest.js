@@ -5,6 +5,9 @@ import { supabase } from './supabase-client.js';
 
 const GUEST_KEY = 'football_manager_guest_id';
 
+// ====================================================
+// شناسه مهمان
+// ====================================================
 export function getGuestId() {
   let guestId = localStorage.getItem(GUEST_KEY);
   
@@ -26,7 +29,7 @@ export function clearGuestId() {
 }
 
 // ====================================================
-// ورود به عنوان مهمان (با اسم)
+// ورود مهمان با اسم
 // ====================================================
 export async function loginAsGuest(name) {
   if (!name || name.trim().length < 2) {
@@ -36,20 +39,23 @@ export async function loginAsGuest(name) {
   const guestId = getGuestId();
   const cleanName = name.trim();
   
-  console.log('🎮 ورود مهمان با اسم:', cleanName);
-  console.log('🆔 شناسه دستگاه:', guestId);
+  console.log('🎮 ورود مهمان:', cleanName);
   
-  // چک کن قبلاً پروفایل مهمان ساخته شده؟
-  const { data: existing } = await supabase
+  // چک کن قبلاً مهمان بوده؟
+  const { data: existing, error: checkError } = await supabase
     .from('profiles')
     .select('*')
     .eq('device_id', guestId)
     .eq('is_guest', true)
     .maybeSingle();
   
+  if (checkError) {
+    console.error('خطا در چک مهمان:', checkError);
+  }
+  
   if (existing) {
-    // آپدیت اسم و آخرین ورود
-    await supabase
+    // آپدیت
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({ 
         display_name: cleanName,
@@ -57,15 +63,18 @@ export async function loginAsGuest(name) {
       })
       .eq('id', existing.id);
     
+    if (updateError) console.error('خطا در آپدیت:', updateError);
+    
     console.log('✅ مهمان قبلی آپدیت شد');
     return { ...existing, display_name: cleanName };
   }
   
-  // پروفایل مهمان جدید
+  // ساخت مهمان جدید
   const guestProfile = {
     id: crypto.randomUUID(),
     email: null,
     display_name: cleanName,
+    username: null,
     avatar_url: null,
     device_id: guestId,
     is_guest: true,
