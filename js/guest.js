@@ -1,13 +1,10 @@
 // guest.js
-// مدیریت کاربران مهمان (بدون لاگین)
+// مدیریت کاربران مهمان
 
 import { supabase } from './supabase-client.js';
 
 const GUEST_KEY = 'football_manager_guest_id';
 
-// ====================================================
-// گرفتن یا ساخت شناسه مهمان
-// ====================================================
 export function getGuestId() {
   let guestId = localStorage.getItem(GUEST_KEY);
   
@@ -15,34 +12,34 @@ export function getGuestId() {
     guestId = crypto.randomUUID();
     localStorage.setItem(GUEST_KEY, guestId);
     console.log('🆕 شناسه مهمان جدید:', guestId);
-  } else {
-    console.log('👤 شناسه مهمان موجود:', guestId);
   }
   
   return guestId;
 }
 
-// ====================================================
-// چک: آیا کاربر مهمانه؟
-// ====================================================
 export function isGuest() {
   return localStorage.getItem(GUEST_KEY) !== null;
 }
 
-// ====================================================
-// پاک کردن مهمان
-// ====================================================
 export function clearGuestId() {
   localStorage.removeItem(GUEST_KEY);
 }
 
 // ====================================================
-// ورود به عنوان مهمان
+// ورود به عنوان مهمان (با اسم)
 // ====================================================
-export async function loginAsGuest() {
-  const guestId = getGuestId();
+export async function loginAsGuest(name) {
+  if (!name || name.trim().length < 2) {
+    throw new Error('اسم معتبر نیست');
+  }
   
-  // چک کن قبلاً پروفایل ساخته شده؟
+  const guestId = getGuestId();
+  const cleanName = name.trim();
+  
+  console.log('🎮 ورود مهمان با اسم:', cleanName);
+  console.log('🆔 شناسه دستگاه:', guestId);
+  
+  // چک کن قبلاً پروفایل مهمان ساخته شده؟
   const { data: existing } = await supabase
     .from('profiles')
     .select('*')
@@ -51,19 +48,24 @@ export async function loginAsGuest() {
     .maybeSingle();
   
   if (existing) {
-    console.log('✅ مهمان قبلی پیدا شد');
+    // آپدیت اسم و آخرین ورود
     await supabase
       .from('profiles')
-      .update({ last_login: new Date().toISOString() })
+      .update({ 
+        display_name: cleanName,
+        last_login: new Date().toISOString() 
+      })
       .eq('id', existing.id);
-    return existing;
+    
+    console.log('✅ مهمان قبلی آپدیت شد');
+    return { ...existing, display_name: cleanName };
   }
   
-  // پروفایل مهمان جدید بساز
+  // پروفایل مهمان جدید
   const guestProfile = {
     id: crypto.randomUUID(),
     email: null,
-    display_name: 'مدیر مهمان',
+    display_name: cleanName,
     avatar_url: null,
     device_id: guestId,
     is_guest: true,
@@ -109,71 +111,3 @@ export async function getCurrentGuestProfile() {
   
   return data;
 }
-
-// ====================================================
-// انتقال اطلاعات مهمان به کاربر لاگین‌کرده
-// ====================================================
-export async function migrateGuestToUser(user) {
-  const guestId = localStorage.getItem(GUEST_KEY);
-  
-  if (!guestId) {
-    console.log('ℹ️ مهمانی برای انتقال نیست');
-    return { migrated: false };
-  }
-  
-  const { data: guestProfile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('device_id', guestId)
-    .eq('is_guest', true)
-    .maybeSingle();
-  
-  if (!guestProfile) {
-    console.log('ℹ️ پروفایل مهمان پیدا نشد');
-    return { migrated: false };
-  }
-  
-  const { data: userProfile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-  
-  if (!userProfile) {
-    console.error('پروفایل کاربر پیدا نشد');
-    return { migrated: false };
-  }
-  
-  const updates = {
-    coins: Math.max(userProfile.coins || 0, guestProfile.coins || 0),
-    gems: Math.max(userProfile.gems || 0, guestProfile.gems || 0),
-    level: Math.max(userProfile.level || 1, guestProfile.level || 1),
-    experience: Math.max(userProfile.experience || 0, guestProfile.experience || 0),
-    matches_played: Math.max(userProfile.matches_played || 0, guestProfile.matches_played || 0),
-    wins: Math.max(userProfile.wins || 0, guestProfile.wins || 0),
-    draws: Math.max(userProfile.draws || 0, guestProfile.draws || 0),
-    losses: Math.max(userProfile.losses || 0, guestProfile.losses || 0),
-    club_name: userProfile.club_name || guestProfile.club_name,
-    club_id: userProfile.club_id || guestProfile.club_id
-  };
-  
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update(updates)
-    .eq('id', user.id);
-  
-  if (updateError) {
-    console.error('خطا در انتقال:', updateError);
-    return { migrated: false };
-  }
-  
-  await supabase
-    .from('profiles')
-    .delete()
-    .eq('id', guestProfile.id);
-  
-  clearGuestId();
-  
-  console.log('✅ اطلاعات مهمان منتقل شد');
-  return { migrated: true, data: updates };
-                    }
