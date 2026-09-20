@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد | مدیر فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard-page">
+
+  <header class="top-bar">
+    <div class="user-info">
+      <img id="userAvatar" class="avatar" src="" alt="آواتار کاربر" loading="lazy">
+      <div>
+        <div id="userName" class="user-name">در حال بارگذاری...</div>
+        <div id="userEmail" class="user-email"></div>
+      </div>
+    </div>
+    
+    <div class="top-bar-actions">
+      <div class="resource-badge">
+        <span class="resource-icon">🪙</span>
+        <span id="coinsDisplay">0</span>
+      </div>
+      <div class="resource-badge">
+        <span class="resource-icon">💎</span>
+        <span id="gemsDisplay">0</span>
+      </div>
+      <button id="logoutBtn" class="logout-btn" type="button">خروج</button>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    
+    <section class="welcome-section">
+      <h1>به مدیر فوتبال خوش آمدی! ⚽</h1>
+      <p class="welcome-text">
+        اینجا شروع ماجراجویی توئه، <span id="welcomeName">مدیر</span> عزیز.
+        به زودی تیمت رو انتخاب می‌کنی و می‌ری تو زمین!
+      </p>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" id="levelDisplay">1</div>
+        <div class="stat-label">سطح</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚽</div>
+        <div class="stat-value" id="matchesDisplay">0</div>
+        <div class="stat-label">مسابقات</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="winsDisplay">0</div>
+        <div class="stat-label">برد</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚖️</div>
+        <div class="stat-value" id="drawsDisplay">0</div>
+        <div class="stat-label">تساوی</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-value" id="lossesDisplay">0</div>
+        <div class="stat-label">باخت</div>
+      </div>
+    </section>
+
+    <section class="coming-soon">
+      <h2>🚧 در دست ساخت</h2>
+      <p>مرحله بعدی: انتخاب تیم و شروع فصل</p>
+    </section>
+
+  </main>
+
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>در حال بارگذاری اطلاعات...</p>
+  </div>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
