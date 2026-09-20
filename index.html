@@ -28,9 +28,7 @@
 
       <div class="login-body">
 
-        <!-- ============================================
-             صفحه ۱: انتخاب (قبلاً بازی کردی؟)
-             ============================================ -->
+        <!-- صفحه ۱: انتخاب -->
         <div id="welcomeStep" class="auth-step">
           <h2>خوش آمدی، مدیر! 👋</h2>
           <p class="login-desc">قبلاً تو این بازی اکانت داشتی؟</p>
@@ -61,15 +59,9 @@
             <span class="guest-icon">👤</span>
             <span>بازی سریع به عنوان مهمان</span>
           </button>
-
-          <div class="guest-warning">
-            ⚠️ پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه.
-          </div>
         </div>
 
-        <!-- ============================================
-             صفحه ۲: ثبت‌نام
-             ============================================ -->
+        <!-- صفحه ۲: ثبت‌نام -->
         <div id="signupStep" class="auth-step" style="display: none;">
           <button class="back-btn" id="backFromSignup" type="button">→ بازگشت</button>
           
@@ -98,9 +90,7 @@
           </form>
         </div>
 
-        <!-- ============================================
-             صفحه ۳: ورود
-             ============================================ -->
+        <!-- صفحه ۳: ورود -->
         <div id="loginStep" class="auth-step" style="display: none;">
           <button class="back-btn" id="backFromLogin" type="button">→ بازگشت</button>
           
@@ -122,6 +112,29 @@
               <span>ورود به بازی</span>
             </button>
           </form>
+        </div>
+
+        <!-- صفحه ۴: مهمان -->
+        <div id="guestStep" class="auth-step" style="display: none;">
+          <button class="back-btn" id="backFromGuest" type="button">→ بازگشت</button>
+          
+          <h2>خوش اومدی، مهمان! 👤</h2>
+          <p class="login-desc">اسمت رو بگو تا بازی رو شروع کنیم</p>
+
+          <form id="guestForm" class="auth-form">
+            <div class="input-group">
+              <span class="input-icon">👤</span>
+              <input type="text" id="guestName" placeholder="اسم مدیر (مثلاً: علی)" required minlength="2" maxlength="20">
+            </div>
+
+            <button type="submit" class="primary-btn">
+              <span>شروع بازی</span>
+            </button>
+          </form>
+
+          <div class="guest-warning">
+            ⚠️ پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه. برای ذخیره دائمی، بعداً اکانت بساز!
+          </div>
         </div>
 
         <div id="errorMessage" class="error-message" role="alert"></div>
