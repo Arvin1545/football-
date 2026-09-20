@@ -1,140 +1,239 @@
 // auth.js
-// مدیریت احراز هویت: گوگل + مهمان
+// مدیریت احراز هویت: ایمیل + مهمان
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
 
-const loginBtn = document.getElementById('googleLoginBtn');
-const guestBtn = document.getElementById('guestLoginBtn');
-const errorMsg = document.getElementById('errorMessage');
-const loadingOverlay = document.getElementById('loadingOverlay');
-const loadingText = document.getElementById('loadingText');
+const els = {
+  tabs: document.querySelectorAll('.auth-tab'),
+  loginForm: document.getElementById('loginForm'),
+  signupForm: document.getElementById('signupForm'),
+  loginEmail: document.getElementById('loginEmail'),
+  loginPassword: document.getElementById('loginPassword'),
+  signupName: document.getElementById('signupName'),
+  signupEmail: document.getElementById('signupEmail'),
+  signupPassword: document.getElementById('signupPassword'),
+  guestBtn: document.getElementById('guestLoginBtn'),
+  errorMsg: document.getElementById('errorMessage'),
+  successMsg: document.getElementById('successMessage'),
+  loadingOverlay: document.getElementById('loadingOverlay'),
+  loadingText: document.getElementById('loadingText')
+};
 
 // ====================================================
-// بررسی نشست قبلی
+// تب‌ها (ورود / ثبت‌نام)
 // ====================================================
-async function checkExistingSession() {
-  const { data: { session }, error } = await supabase.auth.getSession();
+els.tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabName = tab.dataset.tab;
+    
+    els.tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    if (tabName === 'login') {
+      els.loginForm.style.display = 'block';
+      els.signupForm.style.display = 'none';
+    } else {
+      els.loginForm.style.display = 'none';
+      els.signupForm.style.display = 'block';
+    }
+    
+    clearMessages();
+  });
+});
+
+// ====================================================
+// پیام‌ها
+// ====================================================
+function showError(msg) {
+  els.errorMsg.textContent = msg;
+  els.successMsg.textContent = '';
+}
+
+function showSuccess(msg) {
+  els.successMsg.textContent = msg;
+  els.errorMsg.textContent = '';
+}
+
+function clearMessages() {
+  els.errorMsg.textContent = '';
+  els.successMsg.textContent = '';
+}
+
+// ====================================================
+// ترجمه خطاها
+// ====================================================
+function translateError(error) {
+  const msg = error?.message || '';
   
-  if (error) {
-    console.error('خطا در بررسی نشست:', error);
+  if (msg.includes('Invalid login credentials')) return 'ایمیل یا رمز عبور اشتباهه';
+  if (msg.includes('User already registered')) return 'این ایمیل قبلاً ثبت شده. وارد شو.';
+  if (msg.includes('Email not confirmed')) return 'ایمیلت تأیید نشده';
+  if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
+  if (msg.includes('Unable to validate email')) return 'ایمیل معتبر نیست';
+  if (msg.includes('rate limit')) return 'درخواست‌های زیاد. یه دقیقه صبر کن.';
+  if (msg.includes('network')) return 'مشکل اتصال اینترنت';
+  
+  return msg || 'خطای نامشخص. دوباره تلاش کن.';
+}
+
+// ====================================================
+// ورود با ایمیل
+// ====================================================
+els.loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearMessages();
+  
+  const email = els.loginEmail.value.trim();
+  const password = els.loginPassword.value;
+  
+  if (!email || !password) {
+    showError('ایمیل و رمز عبور رو پر کن');
     return;
   }
   
-  // کاربر لاگین‌کرده؟
+  try {
+    els.loadingText.textContent = 'در حال ورود...';
+    els.loadingOverlay.hidden = false;
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    
+    if (error) throw error;
+    
+    showSuccess('✅ ورود موفق! در حال انتقال...');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 600);
+    
+  } catch (error) {
+    console.error(error);
+    els.loadingOverlay.hidden = true;
+    showError(translateError(error));
+  }
+});
+
+// ====================================================
+// ثبت‌نام با ایمیل
+// ====================================================
+els.signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearMessages();
+  
+  const name = els.signupName.value.trim();
+  const email = els.signupEmail.value.trim();
+  const password = els.signupPassword.value;
+  
+  if (!name || !email || !password) {
+    showError('همه فیلدها رو پر کن');
+    return;
+  }
+  
+  if (password.length < 6) {
+    showError('رمز باید حداقل ۶ حرف باشه');
+    return;
+  }
+  
+  try {
+    els.loadingText.textContent = 'در حال ساخت اکانت...';
+    els.loadingOverlay.hidden = false;
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          display_name: name
+        }
+      }
+    });
+    
+    if (error) throw error;
+    
+    // اگه کاربر تازه ثبت‌نام کرد، پروفایل بساز
+    if (data.user) {
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      
+      if (!existingProfile) {
+        await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: email,
+            display_name: name,
+            is_guest: false,
+            coins: 1000,
+            gems: 50,
+            level: 1
+          });
+      }
+    }
+    
+    showSuccess('🎉 اکانت ساخته شد! در حال انتقال...');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 800);
+    
+  } catch (error) {
+    console.error(error);
+    els.loadingOverlay.hidden = true;
+    showError(translateError(error));
+  }
+});
+
+// ====================================================
+// ورود مهمان
+// ====================================================
+els.guestBtn.addEventListener('click', async () => {
+  try {
+    clearMessages();
+    els.loadingText.textContent = 'در حال ساخت پروفایل مهمان...';
+    els.loadingOverlay.hidden = false;
+    
+    await loginAsGuest();
+    
+    showSuccess('✅ خوش اومدی مهمان!');
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 500);
+    
+  } catch (error) {
+    console.error(error);
+    els.loadingOverlay.hidden = true;
+    showError('خطا در ساخت پروفایل مهمان. دوباره تلاش کن.');
+  }
+});
+
+// ====================================================
+// چک نشست قبلی
+// ====================================================
+async function checkExistingSession() {
+  const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    console.log('✅ کاربر از قبل لاگین است:', session.user.email);
     window.location.href = 'dashboard.html';
     return;
   }
   
-  // کاربر مهمان؟
   const guestId = localStorage.getItem('football_manager_guest_id');
   if (guestId) {
-    const { data: guestProfile } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('id')
       .eq('device_id', guestId)
       .eq('is_guest', true)
       .maybeSingle();
     
-    if (guestProfile) {
-      console.log('👤 مهمان قبلی وارد داشبورد شد');
+    if (data) {
       window.location.href = 'dashboard.html';
     }
   }
 }
-
-// ====================================================
-// ورود با گوگل
-// ====================================================
-async function loginWithGoogle() {
-  try {
-    loginBtn.disabled = true;
-    guestBtn.disabled = true;
-    loadingText.textContent = 'در حال اتصال به گوگل...';
-    loadingOverlay.hidden = false;
-    errorMsg.textContent = '';
-
-    const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '/');
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${baseUrl}dashboard.html`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent'
-        }
-      }
-    });
-
-    if (error) throw error;
-  } catch (error) {
-    console.error('خطا در ورود:', error);
-    handleLoginError(error);
-  }
-}
-
-// ====================================================
-// ورود به عنوان مهمان
-// ====================================================
-async function loginGuest() {
-  try {
-    guestBtn.disabled = true;
-    loginBtn.disabled = true;
-    loadingText.textContent = 'در حال ساخت پروفایل مهمان...';
-    loadingOverlay.hidden = false;
-    errorMsg.textContent = '';
-
-    await loginAsGuest();
-    
-    console.log('✅ ورود مهمان موفق');
-    window.location.href = 'dashboard.html';
-    
-  } catch (error) {
-    console.error('خطا در ورود مهمان:', error);
-    guestBtn.disabled = false;
-    loginBtn.disabled = false;
-    loadingOverlay.hidden = true;
-    errorMsg.textContent = 'خطا در ساخت پروفایل مهمان. دوباره تلاش کن.';
-  }
-}
-
-// ====================================================
-// مدیریت خطاها
-// ====================================================
-function handleLoginError(error) {
-  loadingOverlay.hidden = true;
-  loginBtn.disabled = false;
-  guestBtn.disabled = false;
-
-  let message = 'خطا در ورود. دوباره تلاش کن.';
-  
-  const errorMessages = {
-    'auth/popup-closed-by-user': 'پنجره ورود بسته شد.',
-    'auth/network-request-failed': 'مشکل اتصال اینترنت.',
-    'auth/too-many-requests': 'درخواست‌های زیاد. صبر کن.',
-    'auth/user-disabled': 'این حساب غیرفعال شده.',
-    'auth/cancelled-popup-request': 'درخواست لغو شد.',
-  };
-
-  if (error?.message) {
-    for (const [key, msg] of Object.entries(errorMessages)) {
-      if (error.message.includes(key)) {
-        message = msg;
-        break;
-      }
-    }
-  }
-
-  errorMsg.textContent = message;
-}
-
-// ====================================================
-// راه‌اندازی
-// ====================================================
-loginBtn.addEventListener('click', loginWithGoogle);
-guestBtn.addEventListener('click', loginGuest);
 
 checkExistingSession();
