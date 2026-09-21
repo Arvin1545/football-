@@ -5,7 +5,6 @@ import { supabase } from './supabase-client.js';
 
 const GUEST_KEY = 'fm_guest_id';
 
-// گرفتن یا ساخت شناسه مهمان
 export function getGuestId() {
   let guestId = localStorage.getItem(GUEST_KEY);
   if (!guestId) {
@@ -19,7 +18,6 @@ export function clearGuestId() {
   localStorage.removeItem(GUEST_KEY);
 }
 
-// ورود مهمان با اسم
 export async function loginAsGuest(name) {
   const cleanName = (name || '').trim();
   
@@ -29,9 +27,8 @@ export async function loginAsGuest(name) {
   
   const deviceId = getGuestId();
   
-  console.log('🎮 ورود مهمان:', cleanName, '| device:', deviceId);
+  console.log('🎮 ورود مهمان:', cleanName);
   
-  // چک کن قبلاً مهمان بوده؟
   const { data: existing } = await supabase
     .from('profiles')
     .select('*')
@@ -40,7 +37,7 @@ export async function loginAsGuest(name) {
     .maybeSingle();
   
   if (existing) {
-    console.log('✅ مهمان قبلی پیدا شد');
+    console.log('✅ مهمان قبلی');
     await supabase
       .from('profiles')
       .update({ 
@@ -52,8 +49,7 @@ export async function loginAsGuest(name) {
     return { ...existing, display_name: cleanName };
   }
   
-  // ساخت مهمان جدید
-  console.log('🆕 ساخت مهمان جدید...');
+  console.log('🆕 مهمان جدید...');
   
   const { data: created, error } = await supabase
     .from('profiles')
@@ -73,11 +69,10 @@ export async function loginAsGuest(name) {
     throw error;
   }
   
-  console.log('✅ مهمان ساخته شد:', created.id);
+  console.log('✅ ساخته شد:', created.id);
   return created;
 }
 
-// گرفتن پروفایل مهمان فعلی
 export async function getCurrentGuestProfile() {
   const deviceId = localStorage.getItem(GUEST_KEY);
   if (!deviceId) return null;
