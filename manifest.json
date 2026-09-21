@@ -1,0 +1,27 @@
+{
+  "name": "امپراتور فوتبال",
+  "short_name": "امپراتور",
+  "description": "بهترین بازی مدیریت فوتبال",
+  "start_url": "/football-/",
+  "scope": "/football-/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#7c3aed",
+  "theme_color": "#7c3aed",
+  "lang": "fa",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "https://arvin1545.github.io/football-/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://arvin1545.github.io/football-/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
