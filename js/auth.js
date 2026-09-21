@@ -1,5 +1,5 @@
 // auth.js
-// مدیریت احراز هویت: ثبت‌نام + ورود + مهمان
+// مدیریت احراز هویت
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
@@ -74,18 +74,18 @@ function clearMessages() {
 
 function translateError(error) {
   const msg = error?.message || '';
-  
   if (msg.includes('Invalid login credentials')) return 'یوزرنیم یا رمز عبور اشتباهه';
   if (msg.includes('User already registered')) return 'این یوزرنیم قبلاً گرفته شده';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
   if (msg.includes('rate limit')) return 'درخواست‌های زیاد. صبر کن';
   if (msg.includes('network')) return 'مشکل اتصال اینترنت';
   if (msg.includes('duplicate') || msg.includes('unique')) return 'این یوزرنیم قبلاً گرفته شده';
-  
   return msg || 'خطای نامشخص';
 }
 
-// ثبت‌نام
+// ====================================================
+// ثبت‌نام → برو انتخاب تیم
+// ====================================================
 els.signupForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -141,10 +141,10 @@ els.signupForm?.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    showSuccess('🎉 اکانت ساخته شد!');
+    showSuccess('🎉 اکانت ساخته شد! حالا تیمت رو انتخاب کن');
     setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 1000);
+      window.location.href = 'team-select.html';
+    }, 1200);
     
   } catch (error) {
     console.error(error);
@@ -153,7 +153,9 @@ els.signupForm?.addEventListener('submit', async (e) => {
   }
 });
 
+// ====================================================
 // ورود
+// ====================================================
 els.loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -179,9 +181,20 @@ els.loginForm?.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
+    // چک کن تیم داره یا نه
+    const { data: team } = await supabase
+      .from('teams')
+      .select('id')
+      .eq('taken_by', data.user.id)
+      .maybeSingle();
+    
     showSuccess('👋 خوش برگشتی!');
     setTimeout(() => {
-      window.location.href = 'dashboard.html';
+      if (team) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'team-select.html';
+      }
     }, 800);
     
   } catch (error) {
@@ -191,7 +204,9 @@ els.loginForm?.addEventListener('submit', async (e) => {
   }
 });
 
+// ====================================================
 // مهمان
+// ====================================================
 els.guestForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -221,11 +236,23 @@ els.guestForm?.addEventListener('submit', async (e) => {
   }
 });
 
+// ====================================================
 // چک نشست
+// ====================================================
 async function checkExistingSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    window.location.href = 'dashboard.html';
+    const { data: team } = await supabase
+      .from('teams')
+      .select('id')
+      .eq('taken_by', session.user.id)
+      .maybeSingle();
+    
+    if (team) {
+      window.location.href = 'dashboard.html';
+    } else {
+      window.location.href = 'team-select.html';
+    }
     return;
   }
   
