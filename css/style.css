@@ -566,4 +566,210 @@ body {
 
 .user-email {
   font-size: 12px;
-  color
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.resource-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #92400e;
+}
+
+.logout-btn {
+  background: transparent;
+  color: var(--danger);
+  border: 1.5px solid var(--danger);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+.dashboard-content {
+  padding: 32px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.welcome-section { margin-bottom: 28px; }
+
+.welcome-section h1 {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-text {
+  color: var(--text-light);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary);
+  box-shadow: 0 12px 28px rgba(109, 40, 217, 0.12);
+}
+
+.stat-icon {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.coming-soon {
+  background: white;
+  border: 2px dashed var(--border);
+  border-radius: 20px;
+  padding: 45px 25px;
+  text-align: center;
+}
+
+.coming-soon h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.coming-soon p {
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.guest-banner {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1.5px solid #fbbf24;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.guest-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.guest-banner-icon { font-size: 28px; }
+
+.guest-banner-text {
+  flex: 1;
+  min-width: 200px;
+}
+
+.guest-banner-text strong {
+  color: #78350f;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 900;
+}
+
+.guest-banner-text p {
+  color: #92400e;
+  font-size: 12.5px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.guest-banner-btn {
+  background: linear-gradient(135deg, var(--warning), var(--gold));
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.guest-banner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* انیمیشن */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ریسپانسیو */
+@media (max-width: 640px) {
+  .login-body { padding: 20px 20px 24px; }
+  .game-title { font-size: 24px; }
+  .header-badge { font-size: 46px; }
+  .top-bar { padding: 12px 16px; }
+  .user-email { display: none; }
+  .dashboard-content { padding: 24px 16px; }
+  .welcome-section h1 { font-size: 22px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .ball { font-size: 30px !important; }
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-light); }
+::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
