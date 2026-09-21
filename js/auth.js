@@ -9,92 +9,54 @@ const els = {
   signupStep: document.getElementById('signupStep'),
   loginStep: document.getElementById('loginStep'),
   guestStep: document.getElementById('guestStep'),
-  
   hasAccountBtn: document.getElementById('hasAccountBtn'),
   noAccountBtn: document.getElementById('noAccountBtn'),
   backFromSignup: document.getElementById('backFromSignup'),
   backFromLogin: document.getElementById('backFromLogin'),
   backFromGuest: document.getElementById('backFromGuest'),
   guestBtn: document.getElementById('guestLoginBtn'),
-  
   signupForm: document.getElementById('signupForm'),
   loginForm: document.getElementById('loginForm'),
   guestForm: document.getElementById('guestForm'),
-  
   signupName: document.getElementById('signupName'),
   signupUsername: document.getElementById('signupUsername'),
   signupPassword: document.getElementById('signupPassword'),
   loginUsername: document.getElementById('loginUsername'),
   loginPassword: document.getElementById('loginPassword'),
   guestName: document.getElementById('guestName'),
-  
   errorMsg: document.getElementById('errorMessage'),
   successMsg: document.getElementById('successMessage'),
   loadingOverlay: document.getElementById('loadingOverlay'),
-  loadingText: document.getElementById('loadingText'),
-  coachMessage: document.getElementById('coachMessage')
+  loadingText: document.getElementById('loadingText')
 };
 
 const FAKE_DOMAIN = 'football-manager.local';
 
-// پیام‌های مربی
-const coachMessages = {
-  welcome: 'سلام مدیر! خوش آمدی به امپراتور فوتبال ⚽',
-  signup: 'یه مدیر جدید! بذار تیمت رو بسازیم 🌟',
-  login: 'خوش برگشتی، مدیر! تیمت منتظرته 👋',
-  guest: 'حالت چطوره مهمان؟ اسمت رو بگو تا شروع کنیم 👤'
-};
-
-function updateCoach(message) {
-  if (els.coachMessage) {
-    els.coachMessage.style.opacity = '0';
-    setTimeout(() => {
-      els.coachMessage.textContent = message;
-      els.coachMessage.style.opacity = '1';
-    }, 200);
-  }
-}
-
-// ساخت ایمیل جعلی از یوزرنیم
 function usernameToEmail(username) {
   return `${username.toLowerCase()}@${FAKE_DOMAIN}`;
 }
 
-// مدیریت صفحه‌ها
 function showStep(step) {
   els.welcomeStep.style.display = 'none';
   els.signupStep.style.display = 'none';
   els.loginStep.style.display = 'none';
   els.guestStep.style.display = 'none';
   
-  if (step === 'welcome') {
-    els.welcomeStep.style.display = 'block';
-    updateCoach(coachMessages.welcome);
-  }
-  if (step === 'signup') {
-    els.signupStep.style.display = 'block';
-    updateCoach(coachMessages.signup);
-  }
-  if (step === 'login') {
-    els.loginStep.style.display = 'block';
-    updateCoach(coachMessages.login);
-  }
-  if (step === 'guest') {
-    els.guestStep.style.display = 'block';
-    updateCoach(coachMessages.guest);
-  }
+  if (step === 'welcome') els.welcomeStep.style.display = 'block';
+  if (step === 'signup') els.signupStep.style.display = 'block';
+  if (step === 'login') els.loginStep.style.display = 'block';
+  if (step === 'guest') els.guestStep.style.display = 'block';
   
   clearMessages();
 }
 
-els.hasAccountBtn.addEventListener('click', () => showStep('login'));
-els.noAccountBtn.addEventListener('click', () => showStep('signup'));
-els.guestBtn.addEventListener('click', () => showStep('guest'));
-els.backFromSignup.addEventListener('click', () => showStep('welcome'));
-els.backFromLogin.addEventListener('click', () => showStep('welcome'));
-els.backFromGuest.addEventListener('click', () => showStep('welcome'));
+els.hasAccountBtn?.addEventListener('click', () => showStep('login'));
+els.noAccountBtn?.addEventListener('click', () => showStep('signup'));
+els.guestBtn?.addEventListener('click', () => showStep('guest'));
+els.backFromSignup?.addEventListener('click', () => showStep('welcome'));
+els.backFromLogin?.addEventListener('click', () => showStep('welcome'));
+els.backFromGuest?.addEventListener('click', () => showStep('welcome'));
 
-// پیام‌ها
 function showError(msg) {
   els.errorMsg.textContent = msg;
   els.successMsg.textContent = '';
@@ -110,22 +72,21 @@ function clearMessages() {
   els.successMsg.textContent = '';
 }
 
-// ترجمه خطاها
 function translateError(error) {
   const msg = error?.message || '';
   
   if (msg.includes('Invalid login credentials')) return 'یوزرنیم یا رمز عبور اشتباهه';
   if (msg.includes('User already registered')) return 'این یوزرنیم قبلاً گرفته شده';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
-  if (msg.includes('rate limit')) return 'درخواست‌های زیاد. یه دقیقه صبر کن';
+  if (msg.includes('rate limit')) return 'درخواست‌های زیاد. صبر کن';
   if (msg.includes('network')) return 'مشکل اتصال اینترنت';
-  if (msg.includes('duplicate key') || msg.includes('unique constraint')) return 'این یوزرنیم قبلاً گرفته شده';
+  if (msg.includes('duplicate') || msg.includes('unique')) return 'این یوزرنیم قبلاً گرفته شده';
   
-  return msg || 'خطای نامشخص. دوباره تلاش کن';
+  return msg || 'خطای نامشخص';
 }
 
 // ثبت‌نام
-els.signupForm.addEventListener('submit', async (e) => {
+els.signupForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
   
@@ -160,7 +121,7 @@ els.signupForm.addEventListener('submit', async (e) => {
     
     if (existingUser) {
       els.loadingOverlay.hidden = true;
-      showError('این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن');
+      showError('این یوزرنیم قبلاً گرفته شده');
       return;
     }
     
@@ -180,35 +141,7 @@ els.signupForm.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    if (data.user) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      
-      if (!existingProfile) {
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: fakeEmail,
-            display_name: name,
-            username: username,
-            is_guest: false,
-            coins: 1000,
-            gems: 50,
-            level: 1
-          });
-        
-        if (insertError) {
-          console.error('خطا:', insertError);
-          throw new Error('خطا در ساخت پروفایل');
-        }
-      }
-    }
-    
-    showSuccess('🎉 اکانت ساخته شد! در حال انتقال...');
+    showSuccess('🎉 اکانت ساخته شد!');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 1000);
@@ -221,7 +154,7 @@ els.signupForm.addEventListener('submit', async (e) => {
 });
 
 // ورود
-els.loginForm.addEventListener('submit', async (e) => {
+els.loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
   
@@ -259,19 +192,19 @@ els.loginForm.addEventListener('submit', async (e) => {
 });
 
 // مهمان
-els.guestForm.addEventListener('submit', async (e) => {
+els.guestForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
   
   const name = els.guestName.value.trim();
   
   if (!name || name.length < 2) {
-    showError('اسمت رو درست وارد کن (حداقل ۲ حرف)');
+    showError('اسمت رو درست وارد کن');
     return;
   }
   
   try {
-    els.loadingText.textContent = 'در حال ورود به بازی...';
+    els.loadingText.textContent = 'در حال ورود...';
     els.loadingOverlay.hidden = false;
     
     await loginAsGuest(name);
@@ -282,13 +215,13 @@ els.guestForm.addEventListener('submit', async (e) => {
     }, 800);
     
   } catch (error) {
-    console.error('خطا در مهمان:', error);
+    console.error(error);
     els.loadingOverlay.hidden = true;
-    showError('خطا در ورود مهمان. دوباره تلاش کن');
+    showError('خطا در ورود مهمان');
   }
 });
 
-// چک نشست قبلی
+// چک نشست
 async function checkExistingSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
@@ -299,10 +232,9 @@ async function checkExistingSession() {
   const guestId = localStorage.getItem('fm_guest_id');
   if (guestId) {
     const { data } = await supabase
-      .from('profiles')
+      .from('guests')
       .select('id')
       .eq('device_id', guestId)
-      .eq('is_guest', true)
       .maybeSingle();
     
     if (data) {
