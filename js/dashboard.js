@@ -1,5 +1,4 @@
 // dashboard.js
-// داشبورد (کاربر + مهمان)
 
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile, clearGuestId } from './guest.js';
@@ -27,14 +26,12 @@ async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
-    // کاربر لاگین‌کرده
     currentUser = session.user;
     isGuestMode = false;
     await loadUserProfile(session.user);
     return;
   }
   
-  // چک مهمان
   const guest = await getCurrentGuestProfile();
   
   if (guest) {
@@ -64,7 +61,7 @@ async function loadUserProfile(user) {
     renderProfile(profile);
     if (els.loadingOverlay) els.loadingOverlay.hidden = true;
   } catch (error) {
-    console.error('خطا:', error);
+    console.error(error);
     if (els.loadingOverlay) els.loadingOverlay.hidden = true;
   }
 }
@@ -73,14 +70,13 @@ async function createUserProfile(user) {
   const username = user.user_metadata?.username || 'user';
   const name = user.user_metadata?.full_name || username;
   
-  const { data: created, error } = await supabase
+  const { data: created } = await supabase
     .from('profiles')
     .insert({
       id: user.id,
       email: user.email,
       display_name: name,
       username: username,
-      is_guest: false,
       coins: 1000,
       gems: 50,
       level: 1
@@ -88,13 +84,7 @@ async function createUserProfile(user) {
     .select()
     .single();
   
-  if (error) {
-    console.error('خطا در ساخت پروفایل:', error);
-    if (els.loadingOverlay) els.loadingOverlay.hidden = true;
-    return;
-  }
-  
-  renderProfile(created);
+  if (created) renderProfile(created);
   if (els.loadingOverlay) els.loadingOverlay.hidden = true;
 }
 
@@ -106,7 +96,7 @@ function renderProfile(profile) {
   }
   
   if (els.userName) els.userName.textContent = profile.display_name || 'مدیر';
-  if (els.userEmail) els.userEmail.textContent = profile.username ? '@' + profile.username : (isGuestMode ? 'حساب مهمان' : '');
+  if (els.userEmail) els.userEmail.textContent = profile.username ? '@' + profile.username : (isGuestMode ? 'مهمان' : '');
   if (els.welcomeName) els.welcomeName.textContent = profile.display_name || 'مدیر';
   
   if (els.coins) els.coins.textContent = profile.coins || 0;
@@ -144,7 +134,6 @@ function showGuestBanner() {
   });
 }
 
-// خروج
 if (els.logoutBtn) {
   els.logoutBtn.addEventListener('click', async () => {
     const msg = isGuestMode 
@@ -165,7 +154,6 @@ if (els.logoutBtn) {
       }
       window.location.href = 'index.html';
     } catch (error) {
-      console.error(error);
       window.location.href = 'index.html';
     }
   });
