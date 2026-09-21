@@ -1,5 +1,4 @@
-// guest.js
-// مدیریت مهمان‌ها
+// guest.js - نسخه تست
 
 import { supabase } from './supabase-client.js';
 
@@ -19,48 +18,68 @@ export function clearGuestId() {
 }
 
 export async function loginAsGuest(name) {
+  alert('🔵 مرحله ۱: شروع');
+  
   const cleanName = (name || '').trim();
   
   if (cleanName.length < 2) {
-    throw new Error('اسم باید حداقل ۲ حرف باشه');
+    alert('❌ اسم کوتاهه');
+    throw new Error('اسم کوتاهه');
   }
   
   const deviceId = getGuestId();
+  alert('🔵 مرحله ۲: deviceId = ' + deviceId);
   
-  // چک قبلی
-  const { data: existing } = await supabase
-    .from('guests')
-    .select('*')
-    .eq('device_id', deviceId)
-    .maybeSingle();
-  
-  if (existing) {
-    await supabase
+  try {
+    // چک قبلی
+    const { data: existing, error: err1 } = await supabase
       .from('guests')
-      .update({ 
-        display_name: cleanName,
-        last_login: new Date().toISOString() 
-      })
-      .eq('id', existing.id);
+      .select('*')
+      .eq('device_id', deviceId)
+      .maybeSingle();
     
-    return { ...existing, display_name: cleanName };
+    alert('🔵 مرحله ۳: چک قبلی → ' + (existing ? 'پیدا شد' : 'نیست') + ' | خطا: ' + (err1 ? err1.message : 'نداره'));
+    
+    if (existing) {
+      await supabase
+        .from('guests')
+        .update({ 
+          display_name: cleanName,
+          last_login: new Date().toISOString() 
+        })
+        .eq('id', existing.id);
+      
+      alert('✅ مهمان قبلی آپدیت شد');
+      return { ...existing, display_name: cleanName };
+    }
+    
+    // جدید
+    alert('🔵 مرحله ۴: ساخت مهمان جدید...');
+    
+    const { data: created, error: err2 } = await supabase
+      .from('guests')
+      .insert({
+        display_name: cleanName,
+        device_id: deviceId,
+        coins: 1000,
+        gems: 50,
+        level: 1
+      })
+      .select()
+      .single();
+    
+    if (err2) {
+      alert('❌ خطا در insert: ' + err2.message + '\nکد: ' + err2.code + '\nجزئیات: ' + (err2.details || 'نداره'));
+      throw err2;
+    }
+    
+    alert('✅ مهمان ساخته شد: ' + created.id);
+    return created;
+    
+  } catch (error) {
+    alert('❌ خطای کلی: ' + error.message);
+    throw error;
   }
-  
-  // جدید
-  const { data: created, error } = await supabase
-    .from('guests')
-    .insert({
-      display_name: cleanName,
-      device_id: deviceId,
-      coins: 1000,
-      gems: 50,
-      level: 1
-    })
-    .select()
-    .single();
-  
-  if (error) throw error;
-  return created;
 }
 
 export async function getCurrentGuestProfile() {
