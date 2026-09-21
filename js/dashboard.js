@@ -1,17 +1,8 @@
 // dashboard.js
-// با دیباگ کامل
+// داشبورد (کاربر + مهمان)
 
 import { supabase } from './supabase-client.js';
-import { getCurrentGuestProfile } from './guest.js';
-
-// ====================================================
-// دیباگ
-// ====================================================
-console.log('🚀 ===== DASHBOARD START =====');
-console.log('📋 localStorage:');
-console.log('   fm_guest_id:', localStorage.getItem('fm_guest_id'));
-console.log('   fm_guest_id_v2:', localStorage.getItem('fm_guest_id_v2'));
-console.log('   football_manager_guest_id:', localStorage.getItem('football_manager_guest_id'));
+import { getCurrentGuestProfile, clearGuestId } from './guest.js';
 
 const els = {
   userAvatar: document.getElementById('userAvatar'),
@@ -32,69 +23,31 @@ const els = {
 let currentUser = null;
 let isGuestMode = false;
 
-// شروع
 async function init() {
-  console.log('🎬 شروع init...');
-  
-  // چک کن کاربر لاگین‌کرده هست؟
   const { data: { session } } = await supabase.auth.getSession();
-  console.log('🔑 session:', session);
   
   if (session) {
-    console.log('👤 کاربر لاگین‌کرده');
+    // کاربر لاگین‌کرده
     currentUser = session.user;
     isGuestMode = false;
     await loadUserProfile(session.user);
     return;
   }
   
-  // چک کن مهمان هست؟
-  console.log('🔍 چک مهمان...');
+  // چک مهمان
+  const guest = await getCurrentGuestProfile();
   
-  const deviceId = localStorage.getItem('fm_guest_id');
-  console.log('   deviceId:', deviceId);
-  
-  if (!deviceId) {
-    console.log('❌ deviceId نیست → برو صفحه اول');
+  if (guest) {
+    currentUser = guest;
+    isGuestMode = true;
+    renderProfile(guest);
+    showGuestBanner();
+    if (els.loadingOverlay) els.loadingOverlay.hidden = true;
+  } else {
     window.location.href = 'index.html';
-    return;
   }
-  
-  // مستقیم از supabase بخون
-  console.log('📡 خواندن از supabase...');
-  const { data: guestProfile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('device_id', deviceId)
-    .eq('is_guest', true)
-    .maybeSingle();
-  
-  console.log('   data:', guestProfile);
-  console.log('   error:', error);
-  
-  if (error) {
-    console.error('❌ خطا:', error);
-    window.location.href = 'index.html';
-    return;
-  }
-  
-  if (!guestProfile) {
-    console.log('❌ مهمان پیدا نشد → برو صفحه اول');
-    window.location.href = 'index.html';
-    return;
-  }
-  
-  console.log('✅ مهمان پیدا شد:', guestProfile.display_name);
-  currentUser = guestProfile;
-  isGuestMode = true;
-  renderProfile(guestProfile);
-  showGuestBanner();
-  
-  if (els.loadingOverlay) els.loadingOverlay.hidden = true;
-  console.log('🎉 داشبورد آماده');
 }
 
-// بارگذاری پروفایل کاربر
 async function loadUserProfile(user) {
   try {
     const { data: profile } = await supabase
@@ -116,12 +69,11 @@ async function loadUserProfile(user) {
   }
 }
 
-// ساخت پروفایل کاربر
 async function createUserProfile(user) {
   const username = user.user_metadata?.username || 'user';
   const name = user.user_metadata?.full_name || username;
   
-  const { data: created } = await supabase
+  const { data: created, error } = await supabase
     .from('profiles')
     .insert({
       id: user.id,
@@ -136,11 +88,16 @@ async function createUserProfile(user) {
     .select()
     .single();
   
-  if (created) renderProfile(created);
+  if (error) {
+    console.error('خطا در ساخت پروفایل:', error);
+    if (els.loadingOverlay) els.loadingOverlay.hidden = true;
+    return;
+  }
+  
+  renderProfile(created);
   if (els.loadingOverlay) els.loadingOverlay.hidden = true;
 }
 
-// نمایش
 function renderProfile(profile) {
   if (!profile) return;
   
@@ -149,7 +106,7 @@ function renderProfile(profile) {
   }
   
   if (els.userName) els.userName.textContent = profile.display_name || 'مدیر';
-  if (els.userEmail) els.userEmail.textContent = profile.email || (profile.is_guest ? 'حساب مهمان' : '');
+  if (els.userEmail) els.userEmail.textContent = profile.username ? '@' + profile.username : (isGuestMode ? 'حساب مهمان' : '');
   if (els.welcomeName) els.welcomeName.textContent = profile.display_name || 'مدیر';
   
   if (els.coins) els.coins.textContent = profile.coins || 0;
@@ -162,7 +119,6 @@ function renderProfile(profile) {
   if (els.losses) els.losses.textContent = profile.losses || 0;
 }
 
-// بنر مهمان
 function showGuestBanner() {
   const banner = document.createElement('div');
   banner.className = 'guest-banner';
@@ -182,7 +138,7 @@ function showGuestBanner() {
   
   document.getElementById('upgradeAccountBtn')?.addEventListener('click', () => {
     if (confirm('می‌خوای اکانت بسازی؟')) {
-      localStorage.removeItem('fm_guest_id');
+      clearGuestId();
       window.location.href = 'index.html';
     }
   });
@@ -201,14 +157,15 @@ if (els.logoutBtn) {
       if (isGuestMode) {
         const guestId = localStorage.getItem('fm_guest_id');
         if (guestId) {
-          await supabase.from('profiles').delete().eq('device_id', guestId).eq('is_guest', true);
+          await supabase.from('guests').delete().eq('device_id', guestId);
         }
-        localStorage.removeItem('fm_guest_id');
+        clearGuestId();
       } else {
         await supabase.auth.signOut();
       }
       window.location.href = 'index.html';
     } catch (error) {
+      console.error(error);
       window.location.href = 'index.html';
     }
   });
