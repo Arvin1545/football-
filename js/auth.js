@@ -83,9 +83,7 @@ function translateError(error) {
   return msg || 'خطای نامشخص';
 }
 
-// ====================================================
-// ثبت‌نام → برو انتخاب تیم
-// ====================================================
+// ثبت‌نام
 els.signupForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -141,10 +139,34 @@ els.signupForm?.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    showSuccess('🎉 اکانت ساخته شد! حالا تیمت رو انتخاب کن');
+    // ساخت پروفایل
+    if (data.user) {
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+      
+      if (!existingProfile) {
+        await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: fakeEmail,
+            display_name: name,
+            username: username,
+            coins: 1000,
+            gems: 50,
+            level: 1
+          });
+      }
+    }
+    
+    els.loadingText.textContent = '🎉 اکانت ساخته شد!';
+    
     setTimeout(() => {
       window.location.href = 'team-select.html';
-    }, 1200);
+    }, 1000);
     
   } catch (error) {
     console.error(error);
@@ -153,9 +175,7 @@ els.signupForm?.addEventListener('submit', async (e) => {
   }
 });
 
-// ====================================================
 // ورود
-// ====================================================
 els.loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -181,14 +201,15 @@ els.loginForm?.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    // چک کن تیم داره یا نه
+    // چک کن تیم داره
     const { data: team } = await supabase
       .from('teams')
       .select('id')
       .eq('taken_by', data.user.id)
       .maybeSingle();
     
-    showSuccess('👋 خوش برگشتی!');
+    els.loadingText.textContent = '👋 خوش برگشتی!';
+    
     setTimeout(() => {
       if (team) {
         window.location.href = 'dashboard.html';
@@ -204,9 +225,7 @@ els.loginForm?.addEventListener('submit', async (e) => {
   }
 });
 
-// ====================================================
 // مهمان
-// ====================================================
 els.guestForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -219,15 +238,16 @@ els.guestForm?.addEventListener('submit', async (e) => {
   }
   
   try {
-    els.loadingText.textContent = 'در حال ورود...';
+    els.loadingText.textContent = 'در حال ورود به بازی...';
     els.loadingOverlay.hidden = false;
     
     await loginAsGuest(name);
     
-    showSuccess('🎮 خوش اومدی ' + name + '!');
+    els.loadingText.textContent = '🎮 خوش اومدی ' + name + '!';
+    
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 800);
+    }, 1000);
     
   } catch (error) {
     console.error(error);
@@ -236,9 +256,7 @@ els.guestForm?.addEventListener('submit', async (e) => {
   }
 });
 
-// ====================================================
 // چک نشست
-// ====================================================
 async function checkExistingSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
