@@ -11,35 +11,41 @@
 </head>
 <body class="login-page">
 
-  <!-- پس‌زمینه رنگی -->
-  <div class="bg-blobs">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-    <div class="blob blob-4"></div>
+  <!-- پس‌زمینه گرادیانت رنگی -->
+  <div class="bg-gradient"></div>
+  
+  <!-- توپ‌های شناکن -->
+  <div class="floating-balls">
+    <span class="ball ball-1">⚽</span>
+    <span class="ball ball-2">🏆</span>
+    <span class="ball ball-3">⚽</span>
+    <span class="ball ball-4">🥇</span>
+    <span class="ball ball-5">⚽</span>
   </div>
 
   <div class="login-container">
     <div class="login-card">
 
-      <!-- هدر با لوگو -->
+      <!-- هدر -->
       <div class="login-header">
-        <div class="trophy-icon">🏆</div>
+        <div class="header-badge">🏆</div>
         <h1 class="game-title">امپراتور فوتبال</h1>
-        <p class="game-subtitle">⚽ بهترین تجربه مدیریت فوتبال ⚽</p>
+        <p class="game-subtitle">⚽ مدیریت کن، بجنگ، قهرمان شو ⚽</p>
       </div>
 
       <div class="login-body">
 
-        <!-- مربی خوش‌آمدگو -->
-        <div class="coach-welcome">
-          <div class="coach-avatar">👨‍💼</div>
-          <div class="speech-bubble">
+        <!-- مربی با حباب -->
+        <div class="coach-box">
+          <div class="coach-avatar">
+            <span>👨‍💼</span>
+          </div>
+          <div class="coach-bubble">
             <p id="coachMessage">سلام مدیر! خوش آمدی به امپراتور فوتبال ⚽</p>
           </div>
         </div>
 
-        <!-- صفحه ۱: انتخاب -->
+        <!-- صفحه ۱ -->
         <div id="welcomeStep" class="auth-step">
           <h2>آماده‌ای شروع کنیم؟ 🚀</h2>
           <p class="login-desc">قبلاً تو این بازی اکانت داشتی؟</p>
@@ -49,16 +55,18 @@
               <span class="choice-icon">✅</span>
               <div class="choice-text">
                 <strong>بله، اکانت دارم</strong>
-                <small>با یوزرنیم و رمز وارد شو</small>
+                <small>وارد شو</small>
               </div>
+              <span class="arrow">←</span>
             </button>
 
             <button class="choice-btn choice-no" id="noAccountBtn" type="button">
               <span class="choice-icon">🌟</span>
               <div class="choice-text">
                 <strong>نه، تازه‌ام</strong>
-                <small>اکانت جدید بساز</small>
+                <small>اکانت بساز</small>
               </div>
+              <span class="arrow">←</span>
             </button>
 
             <button class="choice-btn choice-guest" id="guestLoginBtn" type="button">
@@ -67,48 +75,47 @@
                 <strong>مهمان</strong>
                 <small>سریع بدون ثبت‌نام</small>
               </div>
+              <span class="arrow">←</span>
             </button>
           </div>
         </div>
 
         <!-- صفحه ۲: ثبت‌نام -->
         <div id="signupStep" class="auth-step" style="display: none;">
-          <button class="back-btn" id="backFromSignup" type="button">→ بازگشت</button>
+          <button class="back-btn" id="backFromSignup" type="button">← برگشت</button>
 
-          <h2>ساخت اکانت جدید 🌟</h2>
+          <h2>ساخت اکانت 🌟</h2>
           <p class="login-desc">یه مدیر جدید به لیگ اضافه می‌شه!</p>
 
           <form id="signupForm" class="auth-form">
             <div class="input-group">
               <span class="input-icon">👤</span>
-              <input type="text" id="signupName" placeholder="اسم نمایشی (مثلاً: علی رضایی)" required minlength="2" maxlength="30">
+              <input type="text" id="signupName" placeholder="اسم نمایشی" required minlength="2" maxlength="30">
             </div>
 
             <div class="input-group">
               <span class="input-icon">🆔</span>
-              <input type="text" id="signupUsername" placeholder="یوزرنیم انگلیسی (مثلاً: ali_2024)" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
+              <input type="text" id="signupUsername" placeholder="یوزرنیم (ali_2024)" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
             </div>
 
             <div class="input-group">
               <span class="input-icon">🔒</span>
-              <input type="password" id="signupPassword" placeholder="رمز عبور (حداقل ۶ حرف)" required autocomplete="new-password" minlength="6">
+              <input type="password" id="signupPassword" placeholder="رمز عبور (۶+ حرف)" required autocomplete="new-password" minlength="6">
             </div>
 
             <button type="submit" class="primary-btn">
               <span>🌟 ساخت اکانت</span>
             </button>
 
-            <p class="input-hint">
-              💡 یوزرنیم فقط حروف انگلیسی، عدد و _ (آندرلاین)
-            </p>
+            <p class="input-hint">💡 یوزرنیم: حروف انگلیسی، عدد یا _</p>
           </form>
         </div>
 
         <!-- صفحه ۳: ورود -->
         <div id="loginStep" class="auth-step" style="display: none;">
-          <button class="back-btn" id="backFromLogin" type="button">→ بازگشت</button>
+          <button class="back-btn" id="backFromLogin" type="button">← برگشت</button>
 
-          <h2>خوش برگشتی، مدیر! 👋</h2>
+          <h2>خوش برگشتی! 👋</h2>
           <p class="login-desc">با یوزرنیم و رمزت وارد شو</p>
 
           <form id="loginForm" class="auth-form">
@@ -130,10 +137,10 @@
 
         <!-- صفحه ۴: مهمان -->
         <div id="guestStep" class="auth-step" style="display: none;">
-          <button class="back-btn" id="backFromGuest" type="button">→ بازگشت</button>
+          <button class="back-btn" id="backFromGuest" type="button">← برگشت</button>
 
-          <h2>خوش اومدی، مهمان! 👤</h2>
-          <p class="login-desc">اسمت رو بگو تا شروع کنیم</p>
+          <h2>خوش اومدی مهمان! 👤</h2>
+          <p class="login-desc">اسمت رو بگو</p>
 
           <form id="guestForm" class="auth-form">
             <div class="input-group">
@@ -147,23 +154,25 @@
           </form>
 
           <div class="guest-warning">
-            💡 پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه. برای ذخیره دائمی، اکانت بساز!
+            💡 پیشرفت مهمان فقط روی همین دستگاه ذخیره می‌شه
           </div>
         </div>
 
-        <div id="errorMessage" class="error-message" role="alert"></div>
-        <div id="successMessage" class="success-message" role="alert"></div>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
       </div>
 
       <div class="login-footer">
-        <p>⚽ امپراتور فوتبال — نسخه ۱.۰</p>
+        <p>⚽ امپراتور فوتبال</p>
       </div>
 
     </div>
   </div>
 
   <div id="loadingOverlay" class="loading-overlay" hidden>
-    <div class="spinner"></div>
+    <div class="loader">
+      <div class="loader-ball">⚽</div>
+    </div>
     <p id="loadingText">در حال پردازش...</p>
   </div>
 
