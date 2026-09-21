@@ -1,5 +1,5 @@
 // auth.js
-// مدیریت احراز هویت با Username
+// مدیریت احراز هویت: ثبت‌نام + ورود + مهمان
 
 import { supabase } from './supabase-client.js';
 import { loginAsGuest } from './guest.js';
@@ -31,32 +31,58 @@ const els = {
   errorMsg: document.getElementById('errorMessage'),
   successMsg: document.getElementById('successMessage'),
   loadingOverlay: document.getElementById('loadingOverlay'),
-  loadingText: document.getElementById('loadingText')
+  loadingText: document.getElementById('loadingText'),
+  coachMessage: document.getElementById('coachMessage')
 };
 
-// دامنه جعلی برای Auth
 const FAKE_DOMAIN = 'football-manager.local';
 
-// ====================================================
+// پیام‌های مربی
+const coachMessages = {
+  welcome: 'سلام مدیر! خوش آمدی به امپراتور فوتبال ⚽',
+  signup: 'یه مدیر جدید! بذار تیمت رو بسازیم 🌟',
+  login: 'خوش برگشتی، مدیر! تیمت منتظرته 👋',
+  guest: 'حالت چطوره مهمان؟ اسمت رو بگو تا شروع کنیم 👤'
+};
+
+function updateCoach(message) {
+  if (els.coachMessage) {
+    els.coachMessage.style.opacity = '0';
+    setTimeout(() => {
+      els.coachMessage.textContent = message;
+      els.coachMessage.style.opacity = '1';
+    }, 200);
+  }
+}
+
 // ساخت ایمیل جعلی از یوزرنیم
-// ====================================================
 function usernameToEmail(username) {
   return `${username.toLowerCase()}@${FAKE_DOMAIN}`;
 }
 
-// ====================================================
 // مدیریت صفحه‌ها
-// ====================================================
 function showStep(step) {
   els.welcomeStep.style.display = 'none';
   els.signupStep.style.display = 'none';
   els.loginStep.style.display = 'none';
   els.guestStep.style.display = 'none';
   
-  if (step === 'welcome') els.welcomeStep.style.display = 'block';
-  if (step === 'signup') els.signupStep.style.display = 'block';
-  if (step === 'login') els.loginStep.style.display = 'block';
-  if (step === 'guest') els.guestStep.style.display = 'block';
+  if (step === 'welcome') {
+    els.welcomeStep.style.display = 'block';
+    updateCoach(coachMessages.welcome);
+  }
+  if (step === 'signup') {
+    els.signupStep.style.display = 'block';
+    updateCoach(coachMessages.signup);
+  }
+  if (step === 'login') {
+    els.loginStep.style.display = 'block';
+    updateCoach(coachMessages.login);
+  }
+  if (step === 'guest') {
+    els.guestStep.style.display = 'block';
+    updateCoach(coachMessages.guest);
+  }
   
   clearMessages();
 }
@@ -68,9 +94,7 @@ els.backFromSignup.addEventListener('click', () => showStep('welcome'));
 els.backFromLogin.addEventListener('click', () => showStep('welcome'));
 els.backFromGuest.addEventListener('click', () => showStep('welcome'));
 
-// ====================================================
 // پیام‌ها
-// ====================================================
 function showError(msg) {
   els.errorMsg.textContent = msg;
   els.successMsg.textContent = '';
@@ -86,25 +110,21 @@ function clearMessages() {
   els.successMsg.textContent = '';
 }
 
-// ====================================================
 // ترجمه خطاها
-// ====================================================
 function translateError(error) {
   const msg = error?.message || '';
   
   if (msg.includes('Invalid login credentials')) return 'یوزرنیم یا رمز عبور اشتباهه';
-  if (msg.includes('User already registered')) return 'این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن.';
+  if (msg.includes('User already registered')) return 'این یوزرنیم قبلاً گرفته شده';
   if (msg.includes('Password should be at least')) return 'رمز باید حداقل ۶ حرف باشه';
-  if (msg.includes('rate limit')) return 'درخواست‌های زیاد. یه دقیقه صبر کن.';
+  if (msg.includes('rate limit')) return 'درخواست‌های زیاد. یه دقیقه صبر کن';
   if (msg.includes('network')) return 'مشکل اتصال اینترنت';
   if (msg.includes('duplicate key') || msg.includes('unique constraint')) return 'این یوزرنیم قبلاً گرفته شده';
   
-  return msg || 'خطای نامشخص. دوباره تلاش کن.';
+  return msg || 'خطای نامشخص. دوباره تلاش کن';
 }
 
-// ====================================================
 // ثبت‌نام
-// ====================================================
 els.signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -118,9 +138,8 @@ els.signupForm.addEventListener('submit', async (e) => {
     return;
   }
   
-  // اعتبارسنجی یوزرنیم
   if (!/^[a-z0-9_]{3,20}$/.test(username)) {
-    showError('یوزرنیم باید بین ۳ تا ۲۰ حرف، فقط انگلیسی، عدد یا _ باشه');
+    showError('یوزرنیم باید ۳ تا ۲۰ حرف انگلیسی، عدد یا _ باشه');
     return;
   }
   
@@ -133,7 +152,6 @@ els.signupForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ساخت اکانت...';
     els.loadingOverlay.hidden = false;
     
-    // چک کن یوزرنیم تکراری نباشه
     const { data: existingUser } = await supabase
       .from('profiles')
       .select('id')
@@ -142,14 +160,12 @@ els.signupForm.addEventListener('submit', async (e) => {
     
     if (existingUser) {
       els.loadingOverlay.hidden = true;
-      showError('این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن.');
+      showError('این یوزرنیم قبلاً گرفته شده. یه یوزرنیم دیگه انتخاب کن');
       return;
     }
     
-    // ایمیل جعلی بساز
     const fakeEmail = usernameToEmail(username);
     
-    // ثبت‌نام
     const { data, error } = await supabase.auth.signUp({
       email: fakeEmail,
       password,
@@ -164,7 +180,6 @@ els.signupForm.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    // ساخت پروفایل
     if (data.user) {
       const { data: existingProfile } = await supabase
         .from('profiles')
@@ -187,7 +202,7 @@ els.signupForm.addEventListener('submit', async (e) => {
           });
         
         if (insertError) {
-          console.error('خطا در ساخت پروفایل:', insertError);
+          console.error('خطا:', insertError);
           throw new Error('خطا در ساخت پروفایل');
         }
       }
@@ -196,7 +211,7 @@ els.signupForm.addEventListener('submit', async (e) => {
     showSuccess('🎉 اکانت ساخته شد! در حال انتقال...');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 800);
+    }, 1000);
     
   } catch (error) {
     console.error(error);
@@ -205,9 +220,7 @@ els.signupForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ====================================================
 // ورود
-// ====================================================
 els.loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -224,7 +237,6 @@ els.loginForm.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ورود...';
     els.loadingOverlay.hidden = false;
     
-    // ایمیل جعلی بساز
     const fakeEmail = usernameToEmail(username);
     
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -234,10 +246,10 @@ els.loginForm.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    showSuccess('✅ ورود موفق! در حال انتقال...');
+    showSuccess('👋 خوش برگشتی!');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 600);
+    }, 800);
     
   } catch (error) {
     console.error(error);
@@ -246,9 +258,7 @@ els.loginForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ====================================================
-// ورود مهمان
-// ====================================================
+// مهمان
 els.guestForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -266,21 +276,19 @@ els.guestForm.addEventListener('submit', async (e) => {
     
     await loginAsGuest(name);
     
-    showSuccess('✅ خوش اومدی ' + name + '!');
+    showSuccess('🎮 خوش اومدی ' + name + '!');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
-    }, 500);
+    }, 800);
     
   } catch (error) {
-    console.error(error);
+    console.error('خطا در مهمان:', error);
     els.loadingOverlay.hidden = true;
-    showError('خطا در ورود مهمان. دوباره تلاش کن.');
+    showError('خطا در ورود مهمان. دوباره تلاش کن');
   }
 });
 
-// ====================================================
 // چک نشست قبلی
-// ====================================================
 async function checkExistingSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
@@ -288,7 +296,7 @@ async function checkExistingSession() {
     return;
   }
   
-  const guestId = localStorage.getItem('football_manager_guest_id');
+  const guestId = localStorage.getItem('fm_guest_id');
   if (guestId) {
     const { data } = await supabase
       .from('profiles')
