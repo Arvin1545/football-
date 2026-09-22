@@ -1,37 +1,21 @@
 // team-select.js
-// صفحه انتخاب تیم
 
 import { supabase } from './supabase-client.js';
-import { 
-  getAllTeams, 
-  getTeamsByLeague, 
-  pickTeam, 
-  getTeamColor, 
-  formatMoney,
-  LEAGUES 
-} from './teams.js';
+import { getTeamsByLeague, getTeamColor, formatMoney, LEAGUES } from './teams.js';
 
-let currentFilter = 'all';
-let selectedTeamId = null;
+let currentLeague = null;
 
-// چک کاربر
 async function checkUser() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session) {
-    const guestId = localStorage.getItem('fm_guest_id');
-    if (guestId) {
-      window.location.href = 'dashboard.html';
-      return null;
-    }
     window.location.href = 'index.html';
     return null;
   }
   
-  // چک کن قبلاً تیم انتخاب کرده؟
   const { data: existingTeam } = await supabase
     .from('teams')
-    .select('*')
+    .select('id')
     .eq('taken_by', session.user.id)
     .maybeSingle();
   
@@ -43,17 +27,19 @@ async function checkUser() {
   return session.user;
 }
 
-// بارگذاری تیم‌ها
-async function loadTeams() {
+async function loadTeams(leagueId) {
   const grid = document.getElementById('teamsGrid');
+  const headerLeague = document.getElementById('headerLeague');
   
   try {
-    let teams;
+    const teams = await getTeamsByLeague(leagueId);
+    const leagueInfo = LEAGUES[leagueId];
     
-    if (currentFilter === 'all') {
-      teams = await getAllTeams();
-    } else {
-      teams = await getTeamsByLeague(currentFilter);
+    if (headerLeague && leagueInfo) {
+      headerLeague.innerHTML = `
+        <span>${leagueInfo.flag}</span>
+        <span>${leagueInfo.name}</span>
+      `;
     }
     
     if (teams.length === 0) {
@@ -63,7 +49,6 @@ async function loadTeams() {
     
     grid.innerHTML = teams.map(team => {
       const tier = getTeamColor(team.overall);
-      const league = LEAGUES[team.league];
       const isTaken = team.is_taken;
       
       return `
@@ -76,14 +61,10 @@ async function loadTeams() {
           
           <div class="team-info">
             <h3 class="team-name">${team.name}</h3>
-            <div class="team-league">
-              <span>${league.flag}</span>
-              <span>${league.name}</span>
-            </div>
           </div>
           
           <div class="team-stats">
-            <div class="team-overall" style="color: ${tier.color};">
+            <div class="team-overall" style="--tier-color: ${tier.color};">
               <span class="overall-value">${team.overall}</span>
               <span class="overall-label">OVR</span>
             </div>
@@ -96,14 +77,16 @@ async function loadTeams() {
           <div class="team-stadium">
             <span>🏟️</span>
             <span>${team.stadium_name}</span>
-            <span class="capacity">${(team.stadium_capacity / 1000).toFixed(0)}K</span>
           </div>
         </div>
       `;
     }).join('');
     
     document.querySelectorAll('.team-card:not(.taken)').forEach(card => {
-      card.addEventListener('click', () => openConfirmModal(card.dataset.id));
+      card.addEventListener('click', () => {
+        localStorage.setItem('selected_team_for_contract', card.dataset.id);
+        window.location.href = 'contract.html';
+      });
     });
     
   } catch (error) {
@@ -112,69 +95,20 @@ async function loadTeams() {
   }
 }
 
-// فیلتر لیگ‌ها
-document.querySelectorAll('.league-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.league-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentFilter = tab.dataset.league;
-    loadTeams();
-  });
+document.getElementById('backBtn')?.addEventListener('click', () => {
+  window.location.href = 'league-select.html';
 });
 
-// مودال تایید
-const modal = document.getElementById('confirmModal');
-const confirmTeamName = document.getElementById('confirmTeamName');
-
-async function openConfirmModal(teamId) {
-  selectedTeamId = teamId;
-  
-  const { data: team } = await supabase
-    .from('teams')
-    .select('name')
-    .eq('id', teamId)
-    .single();
-  
-  if (team) {
-    confirmTeamName.textContent = team.name;
-    modal.hidden = false;
-  }
-}
-
-document.getElementById('cancelPick')?.addEventListener('click', () => {
-  modal.hidden = true;
-  selectedTeamId = null;
-});
-
-document.getElementById('confirmPick')?.addEventListener('click', async () => {
-  if (!selectedTeamId) return;
-  
-  modal.hidden = true;
-  
-  const overlay = document.getElementById('loadingOverlay');
-  const loadingText = document.getElementById('loadingText');
-  loadingText.textContent = 'در حال ثبت تیم...';
-  overlay.hidden = false;
-  
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    await pickTeam(selectedTeamId, session.user.id);
-    
-    loadingText.textContent = '🎉 تیمت ثبت شد!';
-    setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 1500);
-    
-  } catch (error) {
-    console.error(error);
-    overlay.hidden = true;
-    alert('خطا: ' + error.message);
-  }
-});
-
-// شروع
 (async () => {
   const user = await checkUser();
   if (!user) return;
-  await loadTeams();
+  
+  currentLeague = localStorage.getItem('selected_league');
+  
+  if (!currentLeague) {
+    window.location.href = 'league-select.html';
+    return;
+  }
+  
+  await loadTeams(currentLeague);
 })();
