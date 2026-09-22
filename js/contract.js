@@ -2,26 +2,22 @@
 // صفحه قرارداد
 
 import { supabase } from './supabase-client.js';
-import { pickTeam, formatMoney, getTeamColor, LEAGUES } from './teams.js';
+import { pickTeam, formatMoney, LEAGUES } from './teams.js';
 import { createPlayersForTeam } from './players.js';
 
 let teamData = null;
 
-// ====================================================
-// محاسبه دستمزد بر اساس قدرت
-// ====================================================
+// دستمزد بر اساس قدرت تیم
 function getSalary(overall) {
-  if (overall >= 90) return 10000000;  // 10M
-  if (overall >= 85) return 8000000;   // 8M
-  if (overall >= 80) return 6000000;   // 6M
-  if (overall >= 75) return 4000000;   // 4M
-  if (overall >= 70) return 2500000;   // 2.5M
-  return 1500000;                      // 1.5M
+  if (overall >= 90) return 10000000;
+  if (overall >= 85) return 8000000;
+  if (overall >= 80) return 6000000;
+  if (overall >= 75) return 4000000;
+  if (overall >= 70) return 2500000;
+  return 1500000;
 }
 
-// ====================================================
-// محاسبه هدف بر اساس قدرت
-// ====================================================
+// هدف بر اساس قدرت
 function getGoal(overall) {
   if (overall >= 90) return {
     icon: '🥇',
@@ -61,9 +57,6 @@ function getGoal(overall) {
   };
 }
 
-// ====================================================
-// بارگذاری اطلاعات تیم
-// ====================================================
 async function loadTeam() {
   const teamId = localStorage.getItem('selected_team_for_contract');
   
@@ -87,16 +80,12 @@ async function loadTeam() {
   renderContract(team);
 }
 
-// ====================================================
-// نمایش قرارداد
-// ====================================================
 function renderContract(team) {
   const league = LEAGUES[team.league];
   const salary = getSalary(team.overall);
   const goal = getGoal(team.overall);
-  const bonus = salary * 10; // پاداش قهرمانی = ۱۰ برابر دستمزد
+  const bonus = salary * 10;
   
-  // اطلاعات تیم
   document.getElementById('cTeamName').textContent = team.name;
   document.getElementById('cTeamNameSign').textContent = team.name;
   document.getElementById('cLeague').textContent = league?.name || team.league;
@@ -105,26 +94,20 @@ function renderContract(team) {
   document.getElementById('cCapacity').textContent = team.stadium_capacity.toLocaleString('fa-IR') + ' نفر';
   document.getElementById('cOverall').textContent = team.overall + ' OVR';
   
-  // مالی
   document.getElementById('cSalary').textContent = formatMoney(salary);
   document.getElementById('cBudget').textContent = formatMoney(team.budget);
   document.getElementById('cBonus').textContent = formatMoney(bonus);
   
-  // هدف
   document.getElementById('cGoalIcon').textContent = goal.icon;
   document.getElementById('cGoalTitle').textContent = goal.title;
   document.getElementById('cGoalDesc').textContent = goal.desc;
   
-  // رنگ هدر
   const header = document.querySelector('.contract-header');
   if (header) {
     header.style.background = `linear-gradient(135deg, ${team.primary_color}, ${team.secondary_color})`;
   }
 }
 
-// ====================================================
-// امضا
-// ====================================================
 document.getElementById('signBtn')?.addEventListener('click', async () => {
   if (!teamData) return;
   
@@ -137,14 +120,11 @@ document.getElementById('signBtn')?.addEventListener('click', async () => {
     overlay.hidden = false;
     loadingText.textContent = 'در حال ثبت قرارداد...';
     
-    // ۱. ثبت تیم
     const pickedTeam = await pickTeam(teamData.id, session.user.id);
     
-    // ۲. ساخت بازیکنان
     loadingText.textContent = 'در حال ساخت بازیکنان...';
     await createPlayersForTeam(pickedTeam.id, pickedTeam.name);
     
-    // ۳. ذخیره اطلاعات قرارداد در پروفایل
     const salary = getSalary(teamData.overall);
     const goal = getGoal(teamData.overall);
     
@@ -161,7 +141,6 @@ document.getElementById('signBtn')?.addEventListener('click', async () => {
     
     loadingText.textContent = '🎉 قرارداد امضا شد!';
     
-    // پاک کردن
     localStorage.removeItem('selected_team_for_contract');
     localStorage.removeItem('selected_league');
     
@@ -176,9 +155,6 @@ document.getElementById('signBtn')?.addEventListener('click', async () => {
   }
 });
 
-// ====================================================
-// انصراف
-// ====================================================
 document.getElementById('cancelBtn')?.addEventListener('click', () => {
   if (confirm('مطمئنی می‌خوای انصراف بدی؟')) {
     localStorage.removeItem('selected_team_for_contract');
@@ -186,5 +162,4 @@ document.getElementById('cancelBtn')?.addEventListener('click', () => {
   }
 });
 
-// شروع
 loadTeam();
