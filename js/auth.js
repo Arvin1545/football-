@@ -83,7 +83,9 @@ function translateError(error) {
   return msg || 'خطای نامشخص';
 }
 
-// ثبت‌نام
+// ====================================================
+// ثبت‌نام - با timeout و مدیریت خطا
+// ====================================================
 els.signupForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -111,6 +113,9 @@ els.signupForm?.addEventListener('submit', async (e) => {
     els.loadingText.textContent = 'در حال ساخت اکانت...';
     els.loadingOverlay.hidden = false;
     
+    console.log('🔵 شروع ثبت‌نام برای:', username);
+    
+    // چک یوزرنیم تکراری
     const { data: existingUser } = await supabase
       .from('profiles')
       .select('id')
@@ -125,6 +130,8 @@ els.signupForm?.addEventListener('submit', async (e) => {
     
     const fakeEmail = usernameToEmail(username);
     
+    console.log('🔵 ایجاد کاربر در Auth...');
+    
     const { data, error } = await supabase.auth.signUp({
       email: fakeEmail,
       password,
@@ -137,45 +144,30 @@ els.signupForm?.addEventListener('submit', async (e) => {
       }
     });
     
-    if (error) throw error;
-    
-    // ساخت پروفایل
-    if (data.user) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', data.user.id)
-        .maybeSingle();
-      
-      if (!existingProfile) {
-        await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: fakeEmail,
-            display_name: name,
-            username: username,
-            coins: 1000,
-            gems: 50,
-            level: 1
-          });
-      }
+    if (error) {
+      console.error('❌ خطا در signUp:', error);
+      throw error;
     }
     
-    els.loadingText.textContent = '🎉 اکانت ساخته شد!';
+    console.log('✅ کاربر ساخته شد:', data.user?.id);
+    
+    // اگه کاربر ساخته شد، برو داشبورد (dashboard.js خودش پروفایل می‌سازه)
+    els.loadingText.textContent = '🎉 خوش اومدی ' + name + '!';
     
     setTimeout(() => {
-      window.location.href = 'team-select.html';
+      window.location.href = 'dashboard.html';
     }, 1000);
     
   } catch (error) {
-    console.error(error);
+    console.error('❌ خطای کلی:', error);
     els.loadingOverlay.hidden = true;
     showError(translateError(error));
   }
 });
 
+// ====================================================
 // ورود
+// ====================================================
 els.loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -201,21 +193,12 @@ els.loginForm?.addEventListener('submit', async (e) => {
     
     if (error) throw error;
     
-    // چک کن تیم داره
-    const { data: team } = await supabase
-      .from('teams')
-      .select('id')
-      .eq('taken_by', data.user.id)
-      .maybeSingle();
+    console.log('✅ ورود موفق');
     
     els.loadingText.textContent = '👋 خوش برگشتی!';
     
     setTimeout(() => {
-      if (team) {
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'team-select.html';
-      }
+      window.location.href = 'dashboard.html';
     }, 800);
     
   } catch (error) {
@@ -225,7 +208,9 @@ els.loginForm?.addEventListener('submit', async (e) => {
   }
 });
 
+// ====================================================
 // مهمان
+// ====================================================
 els.guestForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessages();
@@ -238,8 +223,10 @@ els.guestForm?.addEventListener('submit', async (e) => {
   }
   
   try {
-    els.loadingText.textContent = 'در حال ورود به بازی...';
+    els.loadingText.textContent = 'در حال ورود...';
     els.loadingOverlay.hidden = false;
+    
+    console.log('🔵 ورود مهمان:', name);
     
     await loginAsGuest(name);
     
@@ -250,27 +237,20 @@ els.guestForm?.addEventListener('submit', async (e) => {
     }, 1000);
     
   } catch (error) {
-    console.error(error);
+    console.error('❌ خطا:', error);
     els.loadingOverlay.hidden = true;
     showError('خطا در ورود مهمان');
   }
 });
 
+// ====================================================
 // چک نشست
+// ====================================================
 async function checkExistingSession() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    const { data: team } = await supabase
-      .from('teams')
-      .select('id')
-      .eq('taken_by', session.user.id)
-      .maybeSingle();
-    
-    if (team) {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'team-select.html';
-    }
+    console.log('✅ کاربر قبلاً لاگین‌کرده');
+    window.location.href = 'dashboard.html';
     return;
   }
   
@@ -283,6 +263,7 @@ async function checkExistingSession() {
       .maybeSingle();
     
     if (data) {
+      console.log('✅ مهمان قبلی');
       window.location.href = 'dashboard.html';
     }
   }
