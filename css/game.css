@@ -1,0 +1,1150 @@
+/* ====================================================
+   game.css — استایل صفحه اصلی بازی
+   ==================================================== */
+
+.game-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #f0f9ff 0%, #faf5ff 50%, #fef3c7 100%);
+  padding-bottom: 40px;
+  overflow-x: hidden;
+}
+
+/* ====================================================
+   هدر بالا
+   ==================================================== */
+
+.game-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 2px solid #f3e8ff;
+  gap: 12px;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.08);
+}
+
+.menu-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  flex-shrink: 0;
+}
+
+.menu-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+}
+
+.menu-btn span {
+  display: block;
+  width: 20px;
+  height: 2.5px;
+  background: white;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.menu-btn span:nth-child(2) {
+  width: 14px;
+  margin-right: auto;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-icon {
+  font-size: 24px;
+  animation: trophyBounce 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-4px) rotate(5deg); }
+}
+
+.header-name {
+  font-size: 16px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.resource-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #fef3c7, #fed7aa);
+  border: 1.5px solid #fbbf24;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 12px;
+  color: #78350f;
+}
+
+.header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #7c3aed;
+  object-fit: cover;
+  background: #f3e8ff;
+  cursor: pointer;
+}
+
+/* ====================================================
+   منوی کناری (Sidebar)
+   ==================================================== */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  max-width: 85vw;
+  height: 100vh;
+  height: 100dvh;
+  background: white;
+  z-index: 1000;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sidebar-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.sidebar-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-team-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-team-name {
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-team-league {
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+.sidebar-close {
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: right;
+  margin-bottom: 3px;
+}
+
+.nav-item:hover {
+  background: #f3e8ff;
+  color: #7c3aed;
+  transform: translateX(-4px);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  color: white;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.nav-icon {
+  font-size: 20px;
+  width: 26px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nav-text {
+  flex: 1;
+}
+
+.nav-badge {
+  font-size: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.nav-logout {
+  margin-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 14px;
+  color: #dc2626;
+}
+
+.nav-logout:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid #f3e8ff;
+  background: #faf5ff;
+  flex-shrink: 0;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #7c3aed;
+  object-fit: cover;
+  background: white;
+}
+
+.sidebar-user-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.sidebar-user-email {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* ====================================================
+   محتوای اصلی
+   ==================================================== */
+
+.game-content {
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ====================================================
+   کارت تیم اصلی
+   ==================================================== */
+
+.team-card-main {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  min-height: 160px;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+}
+
+.team-card-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  opacity: 0.95;
+}
+
+.team-card-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.3), transparent 60%);
+}
+
+.team-card-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: white;
+}
+
+.team-badge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.team-info-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-name-main {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.team-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  opacity: 0.9;
+  font-weight: 600;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.team-goal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
+}
+
+/* ====================================================
+   بخش‌های عمومی
+   ==================================================== */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.section-title span:first-child {
+  font-size: 20px;
+}
+
+.see-all {
+  margin-right: auto;
+  font-size: 12px;
+  color: #7c3aed;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.see-all:hover {
+  text-decoration: underline;
+}
+
+/* ====================================================
+   بازی بعدی
+   ==================================================== */
+
+.next-match-section {
+  margin-bottom: 20px;
+}
+
+.next-match-card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.1);
+  border: 2px solid #f3e8ff;
+}
+
+.match-countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.countdown-item {
+  text-align: center;
+  background: linear-gradient(135deg, #f3e8ff, #fce7f3);
+  border-radius: 14px;
+  padding: 12px 6px;
+  border: 1.5px solid #e9d5ff;
+}
+
+.countdown-value {
+  font-size: 24px;
+  font-weight: 900;
+  color: #7c3aed;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.countdown-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.match-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #faf5ff;
+  border-radius: 16px;
+}
+
+.match-team {
+  flex: 1;
+  text-align: center;
+}
+
+.match-team-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+  border: 3px solid white;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.match-team-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.match-vs {
+  font-size: 20px;
+  font-weight: 900;
+  color: #7c3aed;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #e9d5ff;
+  flex-shrink: 0;
+}
+
+.match-info-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.match-ready {
+  animation: matchPulse 1s infinite;
+}
+
+@keyframes matchPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.start-match-btn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4); }
+  50% { transform: scale(1.03); box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6); }
+}
+
+/* ====================================================
+   تیکر اخبار
+   ==================================================== */
+
+.news-ticker-section {
+  margin-bottom: 20px;
+}
+
+.news-ticker {
+  background: white;
+  border-radius: 16px;
+  padding: 8px;
+  border: 2px solid #e0f2fe;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.08);
+  overflow: hidden;
+}
+
+.news-ticker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.news-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  font-size: 13px;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-right: 3px solid #0ea5e9;
+}
+
+.news-item:hover {
+  background: #f0f9ff;
+  transform: translateX(-4px);
+}
+
+.news-item.breaking {
+  background: #fef2f2;
+  border-right-color: #dc2626;
+  animation: newsPulse 2s infinite;
+}
+
+@keyframes newsPulse {
+  0%, 100% { background: #fef2f2; }
+  50% { background: #fee2e2; }
+}
+
+.news-tag {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.news-text {
+  flex: 1;
+  color: #1e293b;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.news-time {
+  font-size: 10.5px;
+  color: #94a3b8;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+.news-loading {
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ====================================================
+   آمار سریع
+   ==================================================== */
+
+.quick-stats-section {
+  margin-bottom: 20px;
+}
+
+.quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.quick-stat {
+  background: white;
+  border-radius: 14px;
+  padding: 14px 8px;
+  text-align: center;
+  border: 2px solid #f3e8ff;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.quick-stat:hover {
+  transform: translateY(-3px);
+  border-color: #7c3aed;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.15);
+}
+
+.quick-stat.highlight {
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  border-color: transparent;
+  color: white;
+}
+
+.quick-stat-icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+
+.quick-stat-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #7c3aed;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.quick-stat.highlight .quick-stat-value {
+  color: white;
+}
+
+.quick-stat-label {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.quick-stat.highlight .quick-stat-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ====================================================
+   دسترسی سریع
+   ==================================================== */
+
+.quick-actions-section {
+  margin-bottom: 20px;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 10px;
+  background: white;
+  border-radius: 16px;
+  text-decoration: none;
+  color: #1e293b;
+  border: 2px solid #f3e8ff;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.quick-action:hover {
+  transform: translateY(-4px);
+  border-color: #7c3aed;
+  box-shadow: 0 12px 28px rgba(124, 58, 237, 0.15);
+}
+
+.quick-action-icon {
+  font-size: 28px;
+}
+
+.quick-action-text {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+/* ====================================================
+   حالت افقی (Landscape) — موبایل
+   ==================================================== */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .game-page {
+    padding-bottom: 20px;
+  }
+  
+  .game-header {
+    padding: 8px 14px;
+  }
+  
+  .menu-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .menu-btn span {
+    width: 16px;
+  }
+  
+  .header-icon {
+    font-size: 20px;
+  }
+  
+  .header-name {
+    font-size: 14px;
+  }
+  
+  .resource-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .header-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .game-content {
+    padding: 12px;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .team-card-main {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+    min-height: 120px;
+  }
+  
+  .team-badge {
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+  }
+  
+  .team-name-main {
+    font-size: 18px;
+  }
+  
+  .next-match-section {
+    margin-bottom: 0;
+  }
+  
+  .next-match-card {
+    padding: 14px;
+  }
+  
+  .match-countdown {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  
+  .countdown-item {
+    padding: 8px 4px;
+  }
+  
+  .countdown-value {
+    font-size: 18px;
+  }
+  
+  .countdown-label {
+    font-size: 9px;
+  }
+  
+  .match-team-logo {
+    width: 46px;
+    height: 46px;
+    font-size: 13px;
+  }
+  
+  .match-team-name {
+    font-size: 11px;
+  }
+  
+  .match-vs {
+    font-size: 16px;
+    padding: 6px 12px;
+  }
+  
+  .match-info-bar {
+    font-size: 10px;
+    padding: 8px;
+  }
+  
+  .news-ticker-section {
+    margin-bottom: 0;
+    grid-column: 1 / -1;
+  }
+  
+  .news-item {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  
+  .quick-stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  
+  .quick-stat {
+    padding: 10px 6px;
+  }
+  
+  .quick-stat-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  
+  .quick-stat-value {
+    font-size: 16px;
+  }
+  
+  .quick-stat-label {
+    font-size: 9px;
+  }
+  
+  .quick-actions-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  
+  .quick-action {
+    padding: 12px 6px;
+    gap: 6px;
+  }
+  
+  .quick-action-icon {
+    font-size: 22px;
+  }
+  
+  .quick-action-text {
+    font-size: 10.5px;
+  }
+  
+  .sidebar {
+    width: 260px;
+  }
+}
+
+/* ====================================================
+   موبایل عمودی
+   ==================================================== */
+
+@media (max-width: 640px) and (orientation: portrait) {
+  .header-name {
+    font-size: 14px;
+  }
+  
+  .game-content {
+    padding: 12px;
+  }
+  
+  .team-card-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .team-badge {
+    width: 60px;
+    height: 60px;
+    font-size: 18px;
+  }
+  
+  .team-name-main {
+    font-size: 17px;
+  }
+  
+  .team-meta {
+    font-size: 11px;
+  }
+  
+  .next-match-card {
+    padding: 16px;
+  }
+  
+  .countdown-value {
+    font-size: 20px;
+  }
+  
+  .countdown-label {
+    font-size: 10px;
+  }
+  
+  .match-team-logo {
+    width: 50px;
+    height: 50px;
+    font-size: 14px;
+  }
+  
+  .match-team-name {
+    font-size: 11.5px;
+  }
+  
+  .match-info-bar {
+    font-size: 10.5px;
+  }
+  
+  .quick-stat-value {
+    font-size: 18px;
+  }
+  
+  .quick-stat-icon {
+    font-size: 20px;
+  }
+  
+  .quick-stat-label {
+    font-size: 10px;
+  }
+  
+  .sidebar {
+    width: 280px;
+  }
+}
+
+/* ====================================================
+   دسکتاپ بزرگ
+   ==================================================== */
+
+@media (min-width: 1200px) {
+  .game-content {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  
+  .team-card-main {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+  
+  .next-match-section {
+    margin-bottom: 0;
+  }
+  
+  .news-ticker-section {
+    grid-column: 1 / 2;
+    margin-bottom: 0;
+  }
+  
+  .quick-stats-section {
+    grid-column: 2 / 3;
+    grid-row: 2 / 4;
+    margin-bottom: 0;
+  }
+  
+  .quick-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .quick-stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: right;
+    padding: 18px;
+  }
+  
+  .quick-stat-icon {
+    font-size: 28px;
+    margin-bottom: 0;
+  }
+  
+  .quick-stat-value {
+    font-size: 22px;
+  }
+  
+  .quick-stat-label {
+    font-size: 12px;
+  }
+  
+  .quick-actions-section {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
+  
+  .quick-actions-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+  
+  .quick-action {
+    padding: 20px;
+  }
+  
+  .quick-action-icon {
+    font-size: 32px;
+  }
+  
+  .quick-action-text {
+    font-size: 13px;
+  }
+}
+
+/* ====================================================
+   اسکرول‌بار
+   ==================================================== */
+
+.game-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.game-page::-webkit-scrollbar-track {
+  background: #f3e8ff;
+}
+
+.game-page::-webkit-scrollbar-thumb {
+  background: #c4b5fd;
+  border-radius: 4px;
+}
+
+.game-page::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+                              }
