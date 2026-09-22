@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>اخبار | امپراتور فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-page">
+
+  <!-- هدر -->
+  <header class="game-header">
+    <a href="game.html" class="menu-btn back-btn-header">
+      <span>→</span>
+    </a>
+
+    <div class="header-title">
+      <span class="header-icon">📰</span>
+      <span class="header-name">اخبار</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="resource-pill">
+        <span>🪙</span>
+        <span id="coinsDisplay">0</span>
+      </div>
+      <div class="resource-pill">
+        <span>💎</span>
+        <span id="gemsDisplay">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- فیلترها -->
+  <section class="news-filters">
+    <button class="filter-btn active" data-filter="all">
+      <span>🌐</span>
+      <span>همه</span>
+    </button>
+    <button class="filter-btn" data-filter="match">
+      <span>⚽</span>
+      <span>مسابقات</span>
+    </button>
+    <button class="filter-btn" data-filter="transfer">
+      <span>💰</span>
+      <span>نقل و انتقالات</span>
+    </button>
+    <button class="filter-btn" data-filter="injury">
+      <span>🏥</span>
+      <span>مصدومیت</span>
+    </button>
+    <button class="filter-btn" data-filter="achievement">
+      <span>🏆</span>
+      <span>دستاورد</span>
+    </button>
+    <button class="filter-btn" data-filter="interview">
+      <span>🎤</span>
+      <span>مصاحبه</span>
+    </button>
+  </section>
+
+  <!-- لیست اخبار -->
+  <main class="news-list" id="newsList">
+    <div class="news-loading">
+      <div class="loader-ball">⚽</div>
+      <p>در حال بارگذاری اخبار...</p>
+    </div>
+  </main>
+
+  <!-- لودینگ -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loader-ball">⚽</div>
+    <p>در حال بارگذاری...</p>
+  </div>
+
+  <script type="module" src="js/news-page.js"></script>
+</body>
+</html>
