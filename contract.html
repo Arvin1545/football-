@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>قرارداد | امپراتور فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="contract-page">
+
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+
+  <main class="contract-container">
+
+    <div class="contract-paper" id="contractPaper">
+      
+      <!-- هدر قرارداد -->
+      <div class="contract-header">
+        <div class="contract-seal">🏆</div>
+        <h1>قرارداد سرمربیگری</h1>
+        <p class="contract-sub">امپراتور فوتبال</p>
+      </div>
+
+      <!-- اطلاعات تیم -->
+      <div class="contract-section">
+        <h2>📋 اطلاعات تیم</h2>
+        <div class="contract-info-grid">
+          <div class="contract-info-item">
+            <span class="info-label">تیم</span>
+            <span class="info-value" id="cTeamName">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">لیگ</span>
+            <span class="info-value" id="cLeague">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">کشور</span>
+            <span class="info-value" id="cCountry">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">استادیوم</span>
+            <span class="info-value" id="cStadium">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">ظرفیت</span>
+            <span class="info-value" id="cCapacity">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">قدرت تیم</span>
+            <span class="info-value highlight" id="cOverall">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- مالی -->
+      <div class="contract-section">
+        <h2>💰 شرایط مالی</h2>
+        <div class="contract-info-grid">
+          <div class="contract-info-item">
+            <span class="info-label">دستمزد هر بازی</span>
+            <span class="info-value success" id="cSalary">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">بودجه نقل و انتقالات</span>
+            <span class="info-value success" id="cBudget">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">پاداش قهرمانی</span>
+            <span class="info-value success" id="cBonus">-</span>
+          </div>
+          <div class="contract-info-item">
+            <span class="info-label">مدت قرارداد</span>
+            <span class="info-value" id="cDuration">۳ فصل</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- هدف -->
+      <div class="contract-section">
+        <h2>🎯 هدف فصل</h2>
+        <div class="goal-box" id="cGoalBox">
+          <div class="goal-icon" id="cGoalIcon">🏆</div>
+          <div class="goal-content">
+            <div class="goal-title" id="cGoalTitle">-</div>
+            <div class="goal-desc" id="cGoalDesc">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- متن تعهد -->
+      <div class="contract-section">
+        <h2>📝 تعهدات</h2>
+        <ul class="contract-terms">
+          <li>✅ هدایت تیم در تمام مسابقات فصل</li>
+          <li>✅ رعایت قوانین لیگ و فدراسیون</li>
+          <li>✅ ارائه گزارش عملکرد در پایان فصل</li>
+          <li>⚠️ در صورت عدم رسیدن به هدف، ممکن است اخراج شوید</li>
+        </ul>
+      </div>
+
+      <!-- امضا -->
+      <div class="contract-signature">
+        <p class="signature-text">
+          با امضای این قرارداد، شما به عنوان سرمربی رسمی 
+          <strong id="cTeamNameSign">-</strong> 
+          انتخاب می‌شوید و مسئولیت کامل نتایج را می‌پذیرید.
+        </p>
+        
+        <div class="signature-line">
+          <span>امضای مدیر</span>
+          <div class="signature-space" id="signatureSpace"></div>
+        </div>
+      </div>
+
+      <!-- دکمه‌ها -->
+      <div class="contract-actions">
+        <button class="contract-btn cancel" id="cancelBtn" type="button">
+          ❌ انصراف
+        </button>
+        <button class="contract-btn sign" id="signBtn" type="button">
+          ✍️ امضا می‌کنم
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loader-ball">⚽</div>
+    <p id="loadingText">در حال ثبت قرارداد...</p>
+  </div>
+
+  <script type="module" src="js/contract.js"></script>
+</body>
+</html>
