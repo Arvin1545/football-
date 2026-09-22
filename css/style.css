@@ -1,5 +1,5 @@
 /* ====================================================
-   امپراتور فوتبال - استایل حرفه‌ای
+   امپراتور فوتبال - استایل کامل
    ==================================================== */
 
 * {
@@ -13,13 +13,10 @@
   --primary: #6d28d9;
   --primary-light: #8b5cf6;
   --primary-dark: #5b21b6;
-  
   --accent: #0ea5e9;
   --accent-light: #38bdf8;
-  
   --gold: #fbbf24;
   --gold-light: #fcd34d;
-  
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
@@ -79,10 +76,21 @@ body {
   inset: 0;
   background: 
     radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.4), transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.4), transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.15), transparent 60%);
+    radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.4), transparent 40%);
   animation: gradientPulse 10s ease-in-out infinite;
   z-index: 0;
+  pointer-events: none;
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 @keyframes gradientPulse {
@@ -103,10 +111,9 @@ body {
   font-size: 40px;
   opacity: 0.15;
   animation: floatBall 15s ease-in-out infinite;
-  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
 }
 
-.ball-1 { top: 10%; left: 8%; animation-delay: 0s; font-size: 60px; }
+.ball-1 { top: 10%; left: 8%; font-size: 60px; }
 .ball-2 { top: 20%; right: 10%; animation-delay: -3s; font-size: 70px; }
 .ball-3 { bottom: 15%; left: 15%; animation-delay: -6s; font-size: 55px; }
 .ball-4 { bottom: 25%; right: 8%; animation-delay: -9s; font-size: 65px; }
@@ -140,7 +147,6 @@ body {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* هدر کارت */
 .login-header {
   text-align: center;
   padding: 32px 24px 24px;
@@ -157,10 +163,10 @@ body {
   width: 200%;
   height: 200%;
   background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 60%);
-  animation: rotateBg 15s linear infinite;
+  animation: rotate 15s linear infinite;
 }
 
-@keyframes rotateBg {
+@keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
@@ -185,7 +191,6 @@ body {
   font-weight: 900;
   color: white;
   margin-bottom: 4px;
-  letter-spacing: -0.5px;
   position: relative;
   z-index: 1;
   text-shadow: 0 4px 20px rgba(0,0,0,0.2);
@@ -197,10 +202,8 @@ body {
   font-weight: 600;
   position: relative;
   z-index: 1;
-  letter-spacing: 0.5px;
 }
 
-/* بدنه */
 .login-body {
   padding: 24px 26px 28px;
 }
@@ -223,7 +226,6 @@ body {
   font-weight: 500;
 }
 
-/* دکمه‌های انتخاب */
 .choice-buttons {
   display: flex;
   flex-direction: column;
@@ -253,35 +255,12 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.choice-btn.choice-yes {
-  border-color: #bbf7d0;
-  background: linear-gradient(135deg, #f0fdf4, #ffffff);
-}
-
-.choice-btn.choice-yes:hover {
-  border-color: var(--success);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
-}
-
-.choice-btn.choice-no {
-  border-color: #ddd6fe;
-  background: linear-gradient(135deg, #f5f3ff, #ffffff);
-}
-
-.choice-btn.choice-no:hover {
-  border-color: var(--primary);
-  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.2);
-}
-
-.choice-btn.choice-guest {
-  border-color: #bae6fd;
-  background: linear-gradient(135deg, #f0f9ff, #ffffff);
-}
-
-.choice-btn.choice-guest:hover {
-  border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.2);
-}
+.choice-btn.choice-yes { border-color: #bbf7d0; background: linear-gradient(135deg, #f0fdf4, #ffffff); }
+.choice-btn.choice-yes:hover { border-color: var(--success); }
+.choice-btn.choice-no { border-color: #ddd6fe; background: linear-gradient(135deg, #f5f3ff, #ffffff); }
+.choice-btn.choice-no:hover { border-color: var(--primary); }
+.choice-btn.choice-guest { border-color: #bae6fd; background: linear-gradient(135deg, #f0f9ff, #ffffff); }
+.choice-btn.choice-guest:hover { border-color: var(--accent); }
 
 .choice-icon {
   font-size: 24px;
@@ -296,15 +275,12 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.choice-text {
-  flex: 1;
-}
+.choice-text { flex: 1; }
 
 .choice-text strong {
   display: block;
   font-size: 14px;
   font-weight: 800;
-  color: var(--text);
   margin-bottom: 2px;
 }
 
@@ -326,7 +302,6 @@ body {
   color: var(--primary);
 }
 
-/* دکمه بازگشت */
 .back-btn {
   background: transparent;
   border: none;
@@ -345,10 +320,7 @@ body {
   background: #f5f3ff;
 }
 
-/* فرم‌ها */
-.auth-form {
-  text-align: right;
-}
+.auth-form { text-align: right; }
 
 .input-group {
   position: relative;
@@ -390,7 +362,6 @@ body {
   box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.08);
 }
 
-/* دکمه اصلی */
 .primary-btn {
   width: 100%;
   background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -405,17 +376,6 @@ body {
   margin-top: 8px;
   transition: var(--transition);
   box-shadow: 0 6px 20px rgba(109, 40, 217, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.primary-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.6s;
 }
 
 .primary-btn:hover {
@@ -423,15 +383,6 @@ body {
   box-shadow: 0 10px 28px rgba(109, 40, 217, 0.4);
 }
 
-.primary-btn:hover::before {
-  transform: translateX(100%);
-}
-
-.primary-btn:active {
-  transform: translateY(0);
-}
-
-/* راهنما */
 .input-hint {
   margin-top: 12px;
   padding: 10px 12px;
@@ -441,7 +392,6 @@ body {
   font-size: 11.5px;
   color: var(--primary-dark);
   font-weight: 600;
-  text-align: right;
 }
 
 .guest-warning {
@@ -453,10 +403,8 @@ body {
   font-size: 11.5px;
   color: #1e40af;
   font-weight: 600;
-  text-align: right;
 }
 
-/* پیام‌ها */
 .error-message {
   color: var(--danger);
   font-size: 13px;
@@ -475,7 +423,6 @@ body {
   text-align: center;
 }
 
-/* فوتر */
 .login-footer {
   padding: 14px;
   text-align: center;
@@ -505,7 +452,6 @@ body {
 .loader-ball {
   font-size: 70px;
   animation: spinBall 1s linear infinite;
-  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.4));
 }
 
 @keyframes spinBall {
@@ -517,6 +463,614 @@ body {
   color: white;
   font-size: 15px;
   font-weight: 700;
+}
+
+/* ====================================================
+   صفحه انتخاب لیگ و تیم
+   ==================================================== */
+
+.league-select-page,
+.team-select-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4c1d95 100%);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 20px;
+}
+
+.page-header {
+  position: relative;
+  z-index: 5;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-back {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.header-back:hover { background: rgba(255,255,255,0.2); }
+
+.header-title { text-align: center; }
+
+.header-icon {
+  font-size: 54px;
+  margin-bottom: 6px;
+  display: block;
+  animation: bounce 2s infinite;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 4px;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.page-header p {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.header-league {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 6px 14px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.leagues-container,
+.teams-container {
+  padding: 0 20px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ====================================================
+   کارت لیگ
+   ==================================================== */
+
+.leagues-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.league-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.league-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.league-card-bg {
+  position: absolute;
+  inset: 0;
+  transition: all 0.5s;
+}
+
+.league-card:hover .league-card-bg {
+  transform: scale(1.1);
+}
+
+.league-card-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  padding: 24px;
+  width: 100%;
+}
+
+.league-flag-big {
+  font-size: 72px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
+}
+
+.league-name {
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+.league-short {
+  font-size: 12px;
+  opacity: 0.85;
+  font-weight: 600;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+}
+
+.league-info {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.league-info-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.league-card-arrow {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.3s;
+  z-index: 3;
+}
+
+.league-card:hover .league-card-arrow {
+  left: 15px;
+  color: white;
+}
+
+/* ====================================================
+   کارت تیم
+   ==================================================== */
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.team-card {
+  background: white;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.team-card:hover:not(.taken) {
+  transform: translateY(-6px) scale(1.02);
+  border-color: #fbbf24;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(251, 191, 36, 0.3);
+}
+
+.team-card.taken {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.7);
+}
+
+.taken-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  z-index: 3;
+}
+
+.team-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 -4px 10px rgba(0,0,0,0.15);
+  border: 3px solid white;
+}
+
+.team-short {
+  font-size: 18px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1.5px;
+}
+
+.team-info { text-align: center; }
+
+.team-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.team-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.team-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  background: linear-gradient(135deg, #1e1b4b, #4c1d95);
+  padding: 6px 12px;
+  border-radius: 10px;
+  color: white;
+}
+
+.overall-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--tier-color, #fbbf24);
+}
+
+.overall-label {
+  font-size: 7px;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1px;
+  margin-top: 2px;
+  font-weight: 700;
+}
+
+.team-budget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #16a34a;
+}
+
+.team-stadium {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 600;
+  justify-content: center;
+  padding-top: 6px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+/* ====================================================
+   صفحه قرارداد
+   ==================================================== */
+
+.contract-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4c1d95 100%);
+  position: relative;
+  overflow-x: hidden;
+  padding: 30px 20px;
+}
+
+.contract-container {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  animation: paperIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes paperIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.contract-paper {
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  border: 3px solid rgba(251, 191, 36, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.contract-header {
+  text-align: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #6d28d9, #0ea5e9);
+  border-radius: 18px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.5s;
+}
+
+.contract-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 60%);
+  animation: rotate 15s linear infinite;
+}
+
+.contract-seal {
+  font-size: 64px;
+  margin-bottom: 8px;
+  display: inline-block;
+  animation: sealFloat 3s infinite ease-in-out;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes sealFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.contract-header h1 {
+  font-size: 26px;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 4px;
+  text-shadow: 0 3px 15px rgba(0,0,0,0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.contract-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 700;
+  letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.contract-section {
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+.contract-section h2 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.contract-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.contract-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.info-label {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.info-value {
+  font-size: 13px;
+  color: #1e1b4b;
+  font-weight: 800;
+}
+
+.info-value.highlight {
+  color: #6d28d9;
+  font-size: 15px;
+}
+
+.info-value.success { color: #16a34a; }
+
+.goal-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 2px solid #fbbf24;
+  border-radius: 16px;
+}
+
+.goal-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+  animation: goalPulse 2s infinite;
+  filter: drop-shadow(0 4px 10px rgba(251, 191, 36, 0.4));
+}
+
+@keyframes goalPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.goal-content { flex: 1; }
+
+.goal-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: #78350f;
+  margin-bottom: 4px;
+}
+
+.goal-desc {
+  font-size: 12.5px;
+  color: #92400e;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.contract-terms {
+  list-style: none;
+  padding: 0;
+}
+
+.contract-terms li {
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  color: #334155;
+  font-weight: 600;
+  border-right: 3px solid #6d28d9;
+}
+
+.contract-signature {
+  margin-top: 24px;
+  padding: 18px;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border: 2px dashed #0ea5e9;
+  border-radius: 14px;
+}
+
+.signature-text {
+  font-size: 12.5px;
+  color: #0c4a6e;
+  font-weight: 600;
+  line-height: 1.7;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.signature-text strong {
+  color: #6d28d9;
+  font-weight: 900;
+}
+
+.signature-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #bae6fd;
+  font-size: 11.5px;
+  color: #0369a1;
+  font-weight: 700;
+}
+
+.signature-space {
+  flex: 1;
+  height: 30px;
+  margin-right: 20px;
+  border-bottom: 2px dotted #0ea5e9;
+  max-width: 200px;
+}
+
+.contract-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.contract-btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.contract-btn.cancel {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+}
+
+.contract-btn.cancel:hover {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.contract-btn.sign {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}
+
+.contract-btn.sign:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(16, 185, 129, 0.5);
 }
 
 /* ====================================================
@@ -656,10 +1210,7 @@ body {
   box-shadow: 0 12px 28px rgba(109, 40, 217, 0.12);
 }
 
-.stat-icon {
-  font-size: 30px;
-  margin-bottom: 8px;
-}
+.stat-icon { font-size: 30px; margin-bottom: 8px; }
 
 .stat-value {
   font-size: 24px;
@@ -710,11 +1261,7 @@ body {
 }
 
 .guest-banner-icon { font-size: 28px; }
-
-.guest-banner-text {
-  flex: 1;
-  min-width: 200px;
-}
+.guest-banner-text { flex: 1; min-width: 200px; }
 
 .guest-banner-text strong {
   color: #78350f;
@@ -742,22 +1289,167 @@ body {
   font-weight: 800;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.guest-banner-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
-}
+.guest-banner-btn:hover { transform: translateY(-2px); }
 
-/* انیمیشن */
+/* ====================================================
+   انیمیشن
+   ==================================================== */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ریسپانسیو */
-@media (max-width: 640px) {
+/* ====================================================
+   حالت افقی (Landscape) — موبایل
+   ==================================================== */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-header {
+    padding: 10px 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-back {
+    align-self: auto;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .header-title {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .header-icon {
+    font-size: 36px;
+    margin-bottom: 0;
+  }
+  
+  .page-header h1 { font-size: 18px; margin-bottom: 0; }
+  .page-header p { font-size: 10px; }
+  
+  .header-league {
+    margin-bottom: 0;
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+  
+  .leagues-container,
+  .teams-container {
+    padding: 0 14px 20px;
+  }
+  
+  .leagues-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .league-card {
+    min-height: 140px;
+    border-radius: 16px;
+  }
+  
+  .league-flag-big { font-size: 44px; margin-bottom: 4px; }
+  .league-name { font-size: 15px; }
+  .league-short { font-size: 10px; margin-bottom: 8px; }
+  .league-info-item { font-size: 10px; padding: 3px 8px; }
+  .league-card-arrow { font-size: 24px; left: 10px; }
+  
+  .teams-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  
+  .team-card {
+    padding: 10px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+  
+  .team-logo {
+    width: 54px;
+    height: 54px;
+    border-width: 2px;
+  }
+  
+  .team-short { font-size: 14px; }
+  .team-name { font-size: 12px; }
+  .overall-value { font-size: 16px; }
+  .overall-label { font-size: 6px; }
+  .team-budget { font-size: 10px; }
+  .team-stadium { font-size: 9px; }
+  
+  /* قرارداد افقی */
+  .contract-page { padding: 12px; }
+  .contract-paper { padding: 18px; border-radius: 16px; }
+  .contract-header { padding: 14px; margin-bottom: 14px; }
+  .contract-seal { font-size: 40px; }
+  .contract-header h1 { font-size: 18px; }
+  .contract-sub { font-size: 10px; }
+  .contract-section { margin-bottom: 14px; }
+  .contract-section h2 { font-size: 13px; margin-bottom: 8px; }
+  
+  .contract-info-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  
+  .contract-info-item {
+    padding: 7px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .info-label { font-size: 9.5px; }
+  .info-value { font-size: 11px; }
+  .info-value.highlight { font-size: 13px; }
+  
+  .goal-box { padding: 12px; gap: 10px; }
+  .goal-icon { font-size: 34px; }
+  .goal-title { font-size: 14px; }
+  .goal-desc { font-size: 11px; }
+  
+  .contract-terms li { padding: 5px 10px; font-size: 11px; margin-bottom: 4px; }
+  .contract-signature { padding: 12px; margin-top: 14px; }
+  .signature-text { font-size: 11px; margin-bottom: 8px; }
+  .signature-space { height: 20px; }
+  .contract-actions { margin-top: 14px; gap: 8px; }
+  .contract-btn { padding: 11px; font-size: 13px; }
+  
+  /* لودینگ */
+  .loader-ball { font-size: 50px; }
+  
+  /* ورود افقی */
+  .login-page { padding: 10px; }
+  .login-container { max-width: 500px; }
+  .login-header { padding: 20px 24px 16px; }
+  .header-badge { font-size: 40px; margin-bottom: 4px; }
+  .game-title { font-size: 22px; }
+  .game-subtitle { font-size: 10px; }
+  .login-body { padding: 16px 22px 20px; }
+  .auth-step h2 { font-size: 17px; }
+  .login-desc { font-size: 12px; margin-bottom: 14px; }
+  .choice-btn { padding: 11px 14px; }
+  .choice-icon { width: 38px; height: 38px; font-size: 20px; }
+  .choice-text strong { font-size: 13px; }
+  .choice-text small { font-size: 10.5px; }
+  .input-group input { padding: 11px 40px 11px 14px; font-size: 13px; }
+  .primary-btn { padding: 12px; font-size: 14px; }
+}
+
+/* ====================================================
+   موبایل عمودی
+   ==================================================== */
+
+@media (max-width: 640px) and (orientation: portrait) {
   .login-body { padding: 20px 20px 24px; }
   .game-title { font-size: 24px; }
   .header-badge { font-size: 46px; }
@@ -767,8 +1459,26 @@ body {
   .welcome-section h1 { font-size: 22px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ball { font-size: 30px !important; }
+  
+  .page-header h1 { font-size: 22px; }
+  .header-icon { font-size: 46px; }
+  
+  .leagues-grid { grid-template-columns: 1fr; gap: 14px; }
+  .league-card { min-height: 160px; }
+  .league-flag-big { font-size: 54px; }
+  .league-name { font-size: 18px; }
+  
+  .teams-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .team-card { padding: 12px; }
+  
+  .contract-page { padding: 14px 12px; }
+  .contract-paper { padding: 20px 16px; }
+  .contract-header h1 { font-size: 20px; }
+  .contract-seal { font-size: 50px; }
+  .contract-info-grid { grid-template-columns: 1fr; gap: 6px; }
 }
 
+/* اسکرول‌بار */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-light); }
 ::-webkit-scrollbar-thumb { background: var(--primary-light); border-radius: 4px; }
