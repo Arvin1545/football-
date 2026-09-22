@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>حواشی | امپراتور فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-page">
+
+  <!-- هدر -->
+  <header class="game-header">
+    <a href="game.html" class="menu-btn back-btn-header">
+      <span>→</span>
+    </a>
+
+    <div class="header-title">
+      <span class="header-icon">🎭</span>
+      <span class="header-name">حواشی</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="resource-pill">
+        <span>🪙</span>
+        <span id="coinsDisplay">0</span>
+      </div>
+      <div class="resource-pill">
+        <span>💎</span>
+        <span id="gemsDisplay">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- اعلان بالا -->
+  <div class="drama-banner">
+    <span class="banner-icon">🔥</span>
+    <div class="banner-text">
+      <strong>حواشی داغ امروز</strong>
+      <p>شایعات و اخبار داغ لیگ</p>
+    </div>
+  </div>
+
+  <!-- فیلترها -->
+  <section class="news-filters">
+    <button class="filter-btn active" data-filter="all">
+      <span>🌐</span>
+      <span>همه</span>
+    </button>
+    <button class="filter-btn" data-filter="rumor">
+      <span>🔥</span>
+      <span>شایعه</span>
+    </button>
+    <button class="filter-btn" data-filter="conflict">
+      <span>😡</span>
+      <span>درگیری</span>
+    </button>
+    <button class="filter-btn" data-filter="scandal">
+      <span>🚨</span>
+      <span>رسوایی</span>
+    </button>
+    <button class="filter-btn" data-filter="leak">
+      <span>📸</span>
+      <span>افشاگری</span>
+    </button>
+    <button class="filter-btn" data-filter="fake">
+      <span>❌</span>
+      <span>تکذیب</span>
+    </button>
+    <button class="filter-btn" data-filter="prediction">
+      <span>🎯</span>
+      <span>پیش‌بینی</span>
+    </button>
+  </section>
+
+  <!-- لیست حواشی -->
+  <main class="news-list" id="dramaList">
+    <div class="news-loading">
+      <div class="loader-ball">⚽</div>
+      <p>در حال بارگذاری حواشی...</p>
+    </div>
+  </main>
+
+  <!-- لودینگ -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loader-ball">⚽</div>
+    <p>در حال بارگذاری...</p>
+  </div>
+
+  <script type="module" src="js/drama-page.js"></script>
+</body>
+</html>
