@@ -1,5 +1,5 @@
 // contract.js
-// صفحه قرارداد
+// صفحه قرارداد سرمربی
 
 import { supabase } from './supabase-client.js';
 import { pickTeam, formatMoney, LEAGUES } from './teams.js';
@@ -7,17 +7,21 @@ import { createPlayersForTeam } from './players.js';
 
 let teamData = null;
 
-// دستمزد بر اساس قدرت تیم
+// ====================================================
+// محاسبه دستمزد بر اساس قدرت
+// ====================================================
 function getSalary(overall) {
-  if (overall >= 90) return 10000000;
-  if (overall >= 85) return 8000000;
-  if (overall >= 80) return 6000000;
-  if (overall >= 75) return 4000000;
-  if (overall >= 70) return 2500000;
-  return 1500000;
+  if (overall >= 90) return 10000000;  // ۱۰ میلیون
+  if (overall >= 85) return 8000000;   // ۸ میلیون
+  if (overall >= 80) return 6000000;   // ۶ میلیون
+  if (overall >= 75) return 4000000;   // ۴ میلیون
+  if (overall >= 70) return 2500000;   // ۲.۵ میلیون
+  return 1500000;                      // ۱.۵ میلیون
 }
 
-// هدف بر اساس قدرت
+// ====================================================
+// محاسبه هدف بر اساس قدرت
+// ====================================================
 function getGoal(overall) {
   if (overall >= 90) return {
     icon: '🥇',
@@ -57,10 +61,17 @@ function getGoal(overall) {
   };
 }
 
+// ====================================================
+// بارگذاری اطلاعات تیم
+// ====================================================
 async function loadTeam() {
+  console.log('🔵 [CONTRACT] شروع...');
+  
   const teamId = localStorage.getItem('selected_team_for_contract');
+  console.log('🔵 [CONTRACT] teamId:', teamId);
   
   if (!teamId) {
+    console.log('❌ [CONTRACT] تیم انتخاب نشده');
     window.location.href = 'team-select.html';
     return;
   }
@@ -72,94 +83,177 @@ async function loadTeam() {
     .single();
   
   if (error || !team) {
+    console.error('❌ [CONTRACT] خطا:', error);
     window.location.href = 'team-select.html';
     return;
   }
   
+  console.log('✅ [CONTRACT] تیم پیدا شد:', team.name);
   teamData = team;
   renderContract(team);
 }
 
+// ====================================================
+// نمایش قرارداد
+// ====================================================
 function renderContract(team) {
   const league = LEAGUES[team.league];
   const salary = getSalary(team.overall);
   const goal = getGoal(team.overall);
   const bonus = salary * 10;
   
-  document.getElementById('cTeamName').textContent = team.name;
-  document.getElementById('cTeamNameSign').textContent = team.name;
-  document.getElementById('cLeague').textContent = league?.name || team.league;
-  document.getElementById('cCountry').textContent = team.country;
-  document.getElementById('cStadium').textContent = team.stadium_name;
-  document.getElementById('cCapacity').textContent = team.stadium_capacity.toLocaleString('fa-IR') + ' نفر';
-  document.getElementById('cOverall').textContent = team.overall + ' OVR';
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
   
-  document.getElementById('cSalary').textContent = formatMoney(salary);
-  document.getElementById('cBudget').textContent = formatMoney(team.budget);
-  document.getElementById('cBonus').textContent = formatMoney(bonus);
+  // اطلاعات تیم
+  setText('cTeamName', team.name);
+  setText('cTeamNameSign', team.name);
+  setText('cLeague', league?.name || team.league);
+  setText('cCountry', team.country);
+  setText('cStadium', team.stadium_name || '-');
+  setText('cCapacity', (team.stadium_capacity || 0).toLocaleString('fa-IR') + ' نفر');
+  setText('cOverall', team.overall + ' OVR');
   
-  document.getElementById('cGoalIcon').textContent = goal.icon;
-  document.getElementById('cGoalTitle').textContent = goal.title;
-  document.getElementById('cGoalDesc').textContent = goal.desc;
+  // مالی
+  setText('cSalary', formatMoney(salary));
+  setText('cBudget', formatMoney(team.budget));
+  setText('cBonus', formatMoney(bonus));
   
+  // هدف
+  setText('cGoalIcon', goal.icon);
+  setText('cGoalTitle', goal.title);
+  setText('cGoalDesc', goal.desc);
+  
+  // رنگ هدر با رنگ تیم
   const header = document.querySelector('.contract-header');
   if (header) {
     header.style.background = `linear-gradient(135deg, ${team.primary_color}, ${team.secondary_color})`;
   }
+  
+  console.log('✅ [CONTRACT] نمایش داده شد');
 }
 
-document.getElementById('signBtn')?.addEventListener('click', async () => {
-  if (!teamData) return;
+// ====================================================
+// امضا
+// ====================================================
+async function signContract() {
+  console.log('🔵 [CONTRACT] امضا زده شد');
+  
+  if (!teamData) {
+    alert('خطا: اطلاعات تیم نیست');
+    return;
+  }
   
   const overlay = document.getElementById('loadingOverlay');
   const loadingText = document.getElementById('loadingText');
   
   try {
+    if (overlay) overlay.hidden = false;
+    if (loadingText) loadingText.textContent = 'در حال ثبت قرارداد...';
+    
+    // ۱. چک کاربر
     const { data: { session } } = await supabase.auth.getSession();
     
-    overlay.hidden = false;
-    loadingText.textContent = 'در حال ثبت قرارداد...';
+    if (!session) {
+      alert('باید اول وارد بشی');
+      window.location.href = 'index.html';
+      return;
+    }
     
+    console.log('🔵 [CONTRACT] ثبت تیم...');
+    
+    // ۲. ثبت تیم
     const pickedTeam = await pickTeam(teamData.id, session.user.id);
     
-    loadingText.textContent = 'در حال ساخت بازیکنان...';
-    await createPlayersForTeam(pickedTeam.id, pickedTeam.name);
+    console.log('✅ [CONTRACT] تیم ثبت شد');
+    
+    // ۳. ساخت بازیکنان
+    if (loadingText) loadingText.textContent = 'در حال ساخت بازیکنان...';
+    
+    try {
+      await createPlayersForTeam(pickedTeam.id, pickedTeam.name);
+      console.log('✅ [CONTRACT] بازیکنان ساخته شدن');
+    } catch (playerError) {
+      console.warn('⚠️ [CONTRACT] خطا در بازیکنان:', playerError);
+      // ادامه بده
+    }
+    
+    // ۴. ذخیره اطلاعات قرارداد در پروفایل
+    if (loadingText) loadingText.textContent = 'در حال ذخیره قرارداد...';
     
     const salary = getSalary(teamData.overall);
     const goal = getGoal(teamData.overall);
     
-    await supabase
-      .from('profiles')
-      .update({
-        club_id: teamData.id,
-        club_name: teamData.name,
-        salary_per_match: salary,
-        season_goal: goal.title,
-        season_goal_rank: goal.minRank
-      })
-      .eq('id', session.user.id);
+    try {
+      await supabase
+        .from('profiles')
+        .update({
+          club_id: teamData.id,
+          club_name: teamData.name,
+          salary_per_match: salary,
+          season_goal: goal.title,
+          season_goal_rank: goal.minRank
+        })
+        .eq('id', session.user.id);
+      
+      console.log('✅ [CONTRACT] پروفایل آپدیت شد');
+    } catch (profileError) {
+      console.warn('⚠️ [CONTRACT] خطا در پروفایل:', profileError);
+      // ادامه بده
+    }
     
-    loadingText.textContent = '🎉 قرارداد امضا شد!';
+    if (loadingText) loadingText.textContent = '🎉 قرارداد امضا شد!';
     
+    // پاک کردن
     localStorage.removeItem('selected_team_for_contract');
     localStorage.removeItem('selected_league');
     
+    // برو داشبورد
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 1500);
     
   } catch (error) {
-    console.error(error);
-    overlay.hidden = true;
-    alert('خطا: ' + error.message);
+    console.error('❌ [CONTRACT] خطا:', error);
+    if (overlay) overlay.hidden = true;
+    alert('خطا: ' + (error.message || 'دوباره تلاش کن'));
   }
-});
+}
 
-document.getElementById('cancelBtn')?.addEventListener('click', () => {
+// ====================================================
+// انصراف
+// ====================================================
+function cancelContract() {
+  console.log('🔵 [CONTRACT] انصراف زده شد');
+  
   if (confirm('مطمئنی می‌خوای انصراف بدی؟')) {
     localStorage.removeItem('selected_team_for_contract');
     window.location.href = 'team-select.html';
   }
-});
+}
 
-loadTeam();
+// ====================================================
+// راه‌اندازی
+// ====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔵 [CONTRACT] DOM آماده');
+  
+  const signBtn = document.getElementById('signBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  
+  console.log('🔍 [CONTRACT] signBtn:', signBtn ? 'پیدا شد' : 'نیست');
+  console.log('🔍 [CONTRACT] cancelBtn:', cancelBtn ? 'پیدا شد' : 'نیست');
+  
+  if (signBtn) {
+    signBtn.addEventListener('click', signContract);
+  }
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', cancelContract);
+  }
+  
+  // بارگذاری تیم
+  loadTeam();
+});
