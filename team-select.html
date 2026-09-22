@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="screen-orientation" content="landscape">
-  <meta name="x5-orientation" content="landscape">
   <title>انتخاب تیم | امپراتور فوتبال</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,44 +14,17 @@
   <div class="bg-gradient"></div>
   <div class="bg-grid"></div>
 
-  <header class="team-header">
-    <div class="header-content">
-      <div class="header-badge">🏆</div>
-      <div class="header-text">
-        <h1>تیمت رو انتخاب کن</h1>
-        <p>یه تیم انتخاب کن و امپراتوری‌ت رو بساز</p>
+  <header class="page-header">
+    <button class="header-back" id="backBtn" type="button">→ بازگشت</button>
+    <div class="header-title">
+      <div class="header-league" id="headerLeague">
+        <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+        <span>...</span>
       </div>
+      <h1>تیمت رو انتخاب کن</h1>
+      <p>یه تیم انتخاب کن و امپراتوری‌ت رو بساز</p>
     </div>
   </header>
-
-  <div class="league-tabs-wrapper">
-    <div class="league-tabs" id="leagueTabs">
-      <button class="league-tab active" data-league="all">
-        <span class="league-flag">🌍</span>
-        <span>همه</span>
-      </button>
-      <button class="league-tab" data-league="premier-league">
-        <span class="league-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
-        <span>انگلیس</span>
-      </button>
-      <button class="league-tab" data-league="la-liga">
-        <span class="league-flag">🇪🇸</span>
-        <span>اسپانیا</span>
-      </button>
-      <button class="league-tab" data-league="serie-a">
-        <span class="league-flag">🇮🇹</span>
-        <span>ایتالیا</span>
-      </button>
-      <button class="league-tab" data-league="bundesliga">
-        <span class="league-flag">🇩🇪</span>
-        <span>آلمان</span>
-      </button>
-      <button class="league-tab" data-league="ligue-1">
-        <span class="league-flag">🇫🇷</span>
-        <span>فرانسه</span>
-      </button>
-    </div>
-  </div>
 
   <main class="teams-container">
     <div id="teamsGrid" class="teams-grid">
@@ -63,26 +34,6 @@
       </div>
     </div>
   </main>
-
-  <div id="confirmModal" class="confirm-modal" hidden>
-    <div class="confirm-content">
-      <div class="confirm-header">
-        <span class="confirm-icon">⚠️</span>
-        <h2>انتخاب تیم</h2>
-      </div>
-      <p>مطمئنی می‌خوای تیم <strong id="confirmTeamName">...</strong> رو انتخاب کنی؟</p>
-      <p class="confirm-warning">بعد از انتخاب، نمی‌تونی تیمت رو عوض کنی!</p>
-      <div class="confirm-buttons">
-        <button class="cancel-btn" id="cancelPick">انصراف</button>
-        <button class="confirm-btn" id="confirmPick">بله، انتخاب می‌کنم</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="loadingOverlay" class="loading-overlay" hidden>
-    <div class="loader-ball">⚽</div>
-    <p id="loadingText">در حال ثبت تیم...</p>
-  </div>
 
   <script type="module" src="js/team-select.js"></script>
 </body>
