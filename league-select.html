@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>انتخاب لیگ | امپراتور فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="league-select-page">
+
+  <div class="bg-gradient"></div>
+  <div class="bg-grid"></div>
+
+  <header class="page-header">
+    <button class="header-back" id="backBtn" type="button">→ بازگشت</button>
+    <div class="header-title">
+      <span class="header-icon">🏆</span>
+      <h1>یه لیگ انتخاب کن</h1>
+      <p>از کدوم لیگ شروع می‌کنی؟</p>
+    </div>
+  </header>
+
+  <main class="leagues-container">
+    <div id="leaguesGrid" class="leagues-grid">
+      <div class="loading-teams">
+        <div class="loader-ball">⚽</div>
+        <p>در حال بارگذاری...</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="js/league-select.js"></script>
+</body>
+</html>
