@@ -1,55 +1,12 @@
 // players-data.js
-// داده‌های بازیکنان - ۵ تیم اول
+// داده‌های کامل بازیکنان - ۹۶ تیم
 
 export const PLAYERS_DATA = {
   
-  // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Manchester City
-  'Manchester City': [
-    { name: 'Ederson', pos: 'GK', ovr: 87, num: 31 },
-    { name: 'Stefan Ortega', pos: 'GK', ovr: 82, num: 18 },
-    { name: 'Ruben Dias', pos: 'CB', ovr: 88, num: 3 },
-    { name: 'Josko Gvardiol', pos: 'CB', ovr: 85, num: 24 },
-    { name: 'Abdukodir Khusanov', pos: 'CB', ovr: 78, num: 45 },
-    { name: 'Marc Guehi', pos: 'CB', ovr: 82, num: 6 },
-    { name: 'Rayan Ait-Nouri', pos: 'LB', ovr: 83, num: 21 },
-    { name: 'Rico Lewis', pos: 'RB', ovr: 81, num: 82 },
-    { name: 'Rodri', pos: 'CDM', ovr: 90, num: 16 },
-    { name: 'Mateo Kovacic', pos: 'CM', ovr: 84, num: 8 },
-    { name: 'Matheus Nunes', pos: 'CM', ovr: 82, num: 27 },
-    { name: 'Bernardo Silva', pos: 'CAM', ovr: 87, num: 20 },
-    { name: 'Phil Foden', pos: 'CAM', ovr: 88, num: 47 },
-    { name: 'Jeremy Doku', pos: 'LW', ovr: 84, num: 11 },
-    { name: 'Antoine Semenyo', pos: 'RW', ovr: 83, num: 22 },
-    { name: 'Savinho', pos: 'RW', ovr: 82, num: 26 },
-    { name: 'Erling Haaland', pos: 'ST', ovr: 91, num: 9 },
-    { name: 'Omar Marmoush', pos: 'ST', ovr: 84, num: 7 }
-  ],
+  // ============================================
+  // 🇪🇸 لا لیگا — ۲۰ تیم
+  // ============================================
   
-  // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Liverpool
-  'Liverpool': [
-    { name: 'Alisson', pos: 'GK', ovr: 88, num: 1 },
-    { name: 'Giorgi Mamardashvili', pos: 'GK', ovr: 84, num: 25 },
-    { name: 'Vitezslav Jaros', pos: 'GK', ovr: 75, num: 62 },
-    { name: 'Virgil van Dijk', pos: 'CB', ovr: 88, num: 4 },
-    { name: 'Joe Gomez', pos: 'CB', ovr: 82, num: 2 },
-    { name: 'Ronald Araujo', pos: 'CB', ovr: 86, num: 5 },
-    { name: 'Milos Kerkez', pos: 'LB', ovr: 82, num: 6 },
-    { name: 'Kostas Tsimikas', pos: 'LB', ovr: 82, num: 21 },
-    { name: 'Jeremie Frimpong', pos: 'RB', ovr: 84, num: 30 },
-    { name: 'Conor Bradley', pos: 'RB', ovr: 80, num: 84 },
-    { name: 'Wataru Endo', pos: 'CDM', ovr: 81, num: 3 },
-    { name: 'Ryan Gravenberch', pos: 'CM', ovr: 85, num: 38 },
-    { name: 'Alexis Mac Allister', pos: 'CM', ovr: 86, num: 10 },
-    { name: 'Dominik Szoboszlai', pos: 'CAM', ovr: 85, num: 8 },
-    { name: 'Florian Wirtz', pos: 'CAM', ovr: 88, num: 7 },
-    { name: 'Federico Chiesa', pos: 'RW', ovr: 82, num: 14 },
-    { name: 'Cody Gakpo', pos: 'LW', ovr: 84, num: 18 },
-    { name: 'Bradley Barcola', pos: 'LW', ovr: 86, num: 11 },
-    { name: 'Alexander Isak', pos: 'ST', ovr: 87, num: 9 },
-    { name: 'Hugo Ekitike', pos: 'ST', ovr: 82, num: 22 }
-  ],
-  
-  // 🇪🇸 Real Madrid
   'Real Madrid': [
     { name: 'Thibaut Courtois', pos: 'GK', ovr: 89, num: 1 },
     { name: 'Andriy Lunin', pos: 'GK', ovr: 83, num: 13 },
@@ -79,7 +36,6 @@ export const PLAYERS_DATA = {
     { name: 'Yan Diomande', pos: 'LW', ovr: 78, num: 30 }
   ],
   
-  // 🇪🇸 Barcelona
   'Barcelona': [
     { name: 'Joan Garcia', pos: 'GK', ovr: 82, num: 1 },
     { name: 'Wojciech Szczesny', pos: 'GK', ovr: 85, num: 25 },
@@ -107,46 +63,352 @@ export const PLAYERS_DATA = {
     { name: 'Bryan Gil', pos: 'LW', ovr: 80, num: 21 }
   ],
   
-  // 🇩🇪 Bayern Munich
-  'Bayern Munich': [
-    { name: 'Manuel Neuer', pos: 'GK', ovr: 87, num: 1 },
-    { name: 'Sven Ulreich', pos: 'GK', ovr: 78, num: 26 },
-    { name: 'Jonas Urbig', pos: 'GK', ovr: 75, num: 40 },
-    { name: 'Dayot Upamecano', pos: 'CB', ovr: 86, num: 2 },
-    { name: 'Kim Min-jae', pos: 'CB', ovr: 85, num: 3 },
-    { name: 'Jonathan Tah', pos: 'CB', ovr: 85, num: 4 },
-    { name: 'Hiroki Ito', pos: 'CB', ovr: 81, num: 21 },
-    { name: 'Alphonso Davies', pos: 'LB', ovr: 86, num: 19 },
-    { name: 'Nathaniel Brown', pos: 'LB', ovr: 78, num: 27 },
-    { name: 'Sacha Boey', pos: 'RB', ovr: 80, num: 23 },
-    { name: 'Josip Stanisic', pos: 'RB', ovr: 82, num: 44 },
-    { name: 'Joshua Kimmich', pos: 'CDM', ovr: 87, num: 6 },
-    { name: 'Aleksandar Pavlovic', pos: 'CDM', ovr: 82, num: 45 },
-    { name: 'Leon Goretzka', pos: 'CM', ovr: 85, num: 8 },
-    { name: 'Konrad Laimer', pos: 'CM', ovr: 84, num: 27 },
-    { name: 'Tom Bischof', pos: 'CM', ovr: 78, num: 30 },
-    { name: 'Jamal Musiala', pos: 'CAM', ovr: 89, num: 42 },
-    { name: 'Ismaila Sarr', pos: 'RW', ovr: 82, num: 26 },
-    { name: 'Serge Gnabry', pos: 'RW', ovr: 84, num: 7 },
-    { name: 'Michael Olise', pos: 'RW', ovr: 86, num: 17 },
-    { name: 'Luis Diaz', pos: 'LW', ovr: 86, num: 14 },
-    { name: 'Harry Kane', pos: 'ST', ovr: 90, num: 9 },
-    { name: 'Bastian Assomo', pos: 'ST', ovr: 78, num: 28 }
+  'Atletico Madrid': [
+    { name: 'Jan Oblak', pos: 'GK', ovr: 88, num: 13 },
+    { name: 'Juan Musso', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Marco Carnesecchi', pos: 'GK', ovr: 82, num: 25 },
+    { name: 'Jose Maria Gimenez', pos: 'CB', ovr: 86, num: 2 },
+    { name: 'Robin Le Normand', pos: 'CB', ovr: 84, num: 24 },
+    { name: 'Clement Lenglet', pos: 'CB', ovr: 82, num: 15 },
+    { name: 'Cristian Romero', pos: 'CB', ovr: 87, num: 17 },
+    { name: 'Marcos Llorente', pos: 'RB', ovr: 85, num: 14 },
+    { name: 'Marc Pubill', pos: 'RB', ovr: 78, num: 26 },
+    { name: 'Andrea Bertacci', pos: 'LB', ovr: 80, num: 33 },
+    { name: 'Alejandro Grimaldo', pos: 'LB', ovr: 85, num: 21 },
+    { name: 'Rodrigo De Paul', pos: 'CM', ovr: 84, num: 5 },
+    { name: 'Conor Gallagher', pos: 'CM', ovr: 82, num: 4 },
+    { name: 'Pablo Barrios', pos: 'CM', ovr: 82, num: 8 },
+    { name: 'Morten Hjulmand', pos: 'CDM', ovr: 82, num: 6 },
+    { name: 'Koke', pos: 'CM', ovr: 85, num: 6 },
+    { name: 'Kang-In Lee', pos: 'CAM', ovr: 82, num: 17 },
+    { name: 'Alex Baena', pos: 'CAM', ovr: 83, num: 10 },
+    { name: 'Antoine Griezmann', pos: 'ST', ovr: 88, num: 7 },
+    { name: 'Julian Alvarez', pos: 'ST', ovr: 86, num: 19 },
+    { name: 'Jonathan David', pos: 'ST', ovr: 84, num: 11 },
+    { name: 'Ademola Lookman', pos: 'LW', ovr: 85, num: 14 },
+    { name: 'Alexander Sorloth', pos: 'ST', ovr: 83, num: 9 }
+  ],
+  
+  'Athletic Bilbao': [
+    { name: 'Unai Simon', pos: 'GK', ovr: 86, num: 1 },
+    { name: 'Yeray Alvarez', pos: 'CB', ovr: 83, num: 5 },
+    { name: 'Dani Vivian', pos: 'CB', ovr: 83, num: 3 },
+    { name: 'Aitor Paredes', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Youssef Sanogo', pos: 'CB', ovr: 78, num: 24 },
+    { name: 'Yuri Berchiche', pos: 'LB', ovr: 82, num: 17 },
+    { name: 'Andoni Gorosabel', pos: 'RB', ovr: 81, num: 18 },
+    { name: 'Oscar de Marcos', pos: 'RB', ovr: 80, num: 18 },
+    { name: 'Yusuf Diarra', pos: 'LB', ovr: 78, num: 26 },
+    { name: 'Inaki Williams', pos: 'RW', ovr: 85, num: 9 },
+    { name: 'Nico Williams', pos: 'LW', ovr: 86, num: 10 },
+    { name: 'Mikel Jauregizar', pos: 'CM', ovr: 80, num: 23 },
+    { name: 'Oier Zarraga', pos: 'CM', ovr: 79, num: 22 },
+    { name: 'Imanol Garcia', pos: 'CM', ovr: 78, num: 28 },
+    { name: 'Mikel Vesga', pos: 'CDM', ovr: 81, num: 4 },
+    { name: 'Oihan Sancet', pos: 'CAM', ovr: 84, num: 8 },
+    { name: 'Alex Berenguer', pos: 'LW', ovr: 82, num: 7 },
+    { name: 'Gorka Guruzeta', pos: 'ST', ovr: 82, num: 12 },
+    { name: 'Alvaro Djalo', pos: 'LW', ovr: 80, num: 11 }
+  ],
+  
+  'Real Betis': [
+    { name: 'Alvaro Valles', pos: 'GK', ovr: 82, num: 1 },
+    { name: 'Diogo Costa', pos: 'GK', ovr: 84, num: 13 },
+    { name: 'Adrian', pos: 'GK', ovr: 80, num: 25 },
+    { name: 'Marc Bartra', pos: 'CB', ovr: 82, num: 5 },
+    { name: 'Natan', pos: 'CB', ovr: 81, num: 4 },
+    { name: 'Llorens', pos: 'CB', ovr: 78, num: 26 },
+    { name: 'Hector Bellerin', pos: 'RB', ovr: 81, num: 19 },
+    { name: 'Youssouf Sabaly', pos: 'RB', ovr: 80, num: 23 },
+    { name: 'Fran Garcia', pos: 'LB', ovr: 82, num: 3 },
+    { name: 'Junior Firpo', pos: 'LB', ovr: 80, num: 24 },
+    { name: 'Isco', pos: 'CAM', ovr: 85, num: 22 },
+    { name: 'Giovani Lo Celso', pos: 'CM', ovr: 83, num: 20 },
+    { name: 'Pablo Fornals', pos: 'CM', ovr: 82, num: 8 },
+    { name: 'Marc Roca', pos: 'CDM', ovr: 81, num: 6 },
+    { name: 'Nelson Deossa', pos: 'CM', ovr: 78, num: 30 },
+    { name: 'Sergi Altimira', pos: 'CM', ovr: 79, num: 15 },
+    { name: 'Abdessamad Ezzalzouli', pos: 'LW', ovr: 82, num: 11 },
+    { name: 'Antony', pos: 'RW', ovr: 83, num: 17 },
+    { name: 'Riquelme', pos: 'LW', ovr: 81, num: 7 },
+    { name: 'Aron Parrott', pos: 'ST', ovr: 79, num: 29 },
+    { name: 'Chimy Avila', pos: 'ST', ovr: 78, num: 9 }
+  ],
+  
+  'Osasuna': [
+    { name: 'Sergio Herrera', pos: 'GK', ovr: 82, num: 1 },
+    { name: 'Aitor Fernandez', pos: 'GK', ovr: 80, num: 13 },
+    { name: 'Ali', pos: 'CB', ovr: 79, num: 4 },
+    { name: 'David Garcia', pos: 'CB', ovr: 82, num: 5 },
+    { name: 'Jorge Herrando', pos: 'CB', ovr: 78, num: 3 },
+    { name: 'Juan Cruz', pos: 'LB', ovr: 80, num: 17 },
+    { name: 'Ruben Pena', pos: 'RB', ovr: 81, num: 15 },
+    { name: 'Nacho Vidal', pos: 'RB', ovr: 80, num: 2 },
+    { name: 'Lucas Torro', pos: 'CDM', ovr: 80, num: 6 },
+    { name: 'Aimar Oroz', pos: 'CM', ovr: 82, num: 10 },
+    { name: 'Iker Munoz', pos: 'CM', ovr: 79, num: 8 },
+    { name: 'Jon Moncayola', pos: 'CM', ovr: 82, num: 7 },
+    { name: 'Bryan Zaragoza', pos: 'LW', ovr: 82, num: 21 },
+    { name: 'Roberto Torres', pos: 'CM', ovr: 80, num: 14 },
+    { name: 'Ante Budimir', pos: 'ST', ovr: 82, num: 17 },
+    { name: 'Raul Garcia', pos: 'ST', ovr: 78, num: 22 },
+    { name: 'Moi Gomez', pos: 'CM', ovr: 79, num: 19 }
+  ],
+  
+  'Celta Vigo': [
+    { name: 'Ivan Villar', pos: 'GK', ovr: 78, num: 1 },
+    { name: 'Vicente Guaita', pos: 'GK', ovr: 80, num: 13 },
+    { name: 'Carlos Dominguez', pos: 'CB', ovr: 78, num: 3 },
+    { name: 'Carl Starfelt', pos: 'CB', ovr: 81, num: 5 },
+    { name: 'Marcos Alonso', pos: 'LB', ovr: 80, num: 17 },
+    { name: 'Sergio Carreira', pos: 'RB', ovr: 79, num: 22 },
+    { name: 'Joseph Aidoo', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Fran Beltran', pos: 'CDM', ovr: 81, num: 8 },
+    { name: 'Oscar Mingueza', pos: 'RB', ovr: 82, num: 3 },
+    { name: 'Ilaix Moriba', pos: 'CM', ovr: 79, num: 14 },
+    { name: 'Luca de la Torre', pos: 'CM', ovr: 80, num: 23 },
+    { name: 'Franco Cervi', pos: 'LW', ovr: 80, num: 11 },
+    { name: 'Iago Aspas', pos: 'ST', ovr: 85, num: 10 },
+    { name: 'Borja Iglesias', pos: 'ST', ovr: 82, num: 9 },
+    { name: 'Franco Cervi', pos: 'LW', ovr: 80, num: 11 },
+    { name: 'Gonzalo Paciencia', pos: 'ST', ovr: 79, num: 18 },
+    { name: 'Jonathan Bamba', pos: 'LW', ovr: 80, num: 7 }
+  ],
+  
+  'Deportivo Alaves': [
+    { name: 'Antonio Sivera', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Joaquin Panichelli', pos: 'CB', ovr: 78, num: 2 },
+    { name: 'Nikola Maras', pos: 'CB', ovr: 79, num: 4 },
+    { name: 'Nahuel Tenaglia', pos: 'RB', ovr: 79, num: 14 },
+    { name: 'Andoni Gorosabel', pos: 'RB', ovr: 81, num: 18 },
+    { name: 'Adrian Pica', pos: 'LB', ovr: 78, num: 3 },
+    { name: 'Carlos Protesoni', pos: 'CM', ovr: 77, num: 16 },
+    { name: 'Carlos Martin', pos: 'LW', ovr: 79, num: 11 },
+    { name: 'Denis Suarez', pos: 'CM', ovr: 80, num: 6 },
+    { name: 'Carlos Alena', pos: 'CM', ovr: 78, num: 10 },
+    { name: 'Lucas Boye', pos: 'ST', ovr: 80, num: 9 },
+    { name: 'Mariano Diaz', pos: 'ST', ovr: 79, num: 7 }
+  ],
+  
+  'Elche': [
+    { name: 'Matias Dituro', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Alejandro Iturbe', pos: 'GK', ovr: 77, num: 13 },
+    { name: 'Pedro Bigas', pos: 'CB', ovr: 79, num: 4 },
+    { name: 'Victor Chust', pos: 'CB', ovr: 78, num: 5 },
+    { name: 'Rafa Mar', pos: 'CB', ovr: 77, num: 3 },
+    { name: 'Nicolas Fernandez', pos: 'LB', ovr: 78, num: 12 },
+    { name: 'Martin Aguado', pos: 'CM', ovr: 77, num: 6 },
+    { name: 'Guido Villar', pos: 'CM', ovr: 79, num: 8 },
+    { name: 'Nico Castro', pos: 'CM', ovr: 78, num: 10 },
+    { name: 'Dominguez', pos: 'CM', ovr: 77, num: 16 },
+    { name: 'Luca de la Torre', pos: 'CM', ovr: 80, num: 14 },
+    { name: 'Nico Fernandez Mercau', pos: 'LW', ovr: 78, num: 11 },
+    { name: 'Josan', pos: 'LW', ovr: 79, num: 7 },
+    { name: 'Tete Morente', pos: 'LW', ovr: 78, num: 17 },
+    { name: 'Fran Ninio', pos: 'ST', ovr: 78, num: 9 },
+    { name: 'Ivan Sanchez', pos: 'ST', ovr: 79, num: 19 }
+  ],
+  
+  'Getafe': [
+    { name: 'David Soria', pos: 'GK', ovr: 82, num: 13 },
+    { name: 'Luis Maximiano', pos: 'GK', ovr: 78, num: 1 },
+    { name: 'Djene', pos: 'CB', ovr: 82, num: 2 },
+    { name: 'Dakonam Djene', pos: 'CB', ovr: 80, num: 6 },
+    { name: 'Omar Alderete', pos: 'CB', ovr: 81, num: 5 },
+    { name: 'Domingos Duarte', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Diego Rico', pos: 'LB', ovr: 79, num: 17 },
+    { name: 'Jeremy Arambarri', pos: 'CM', ovr: 82, num: 8 },
+    { name: 'Luis Milla', pos: 'CDM', ovr: 80, num: 6 },
+    { name: 'Carles Alena', pos: 'CM', ovr: 78, num: 10 },
+    { name: 'Mauro Arambarri', pos: 'CM', ovr: 78, num: 16 },
+    { name: 'Luis Mola', pos: 'RW', ovr: 79, num: 7 },
+    { name: 'Alvaro Rodriguez', pos: 'ST', ovr: 79, num: 9 },
+    { name: 'Borja Mayoral', pos: 'ST', ovr: 81, num: 19 },
+    { name: 'Chris Ramos', pos: 'ST', ovr: 78, num: 22 }
+  ],
+  
+  'Levante': [
+    { name: 'Roger Brugui', pos: 'ST', ovr: 78, num: 9 },
+    { name: 'Dela', pos: 'ST', ovr: 77, num: 11 },
+    { name: 'Enzo Bardeli', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'Olagasti', pos: 'CM', ovr: 78, num: 6 },
+    { name: 'Ivan Romero', pos: 'ST', ovr: 79, num: 19 },
+    { name: 'Mandi', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Ryan', pos: 'GK', ovr: 79, num: 1 },
+    { name: 'Toljan', pos: 'RB', ovr: 79, num: 2 },
+    { name: 'Oscar Rey', pos: 'CM', ovr: 78, num: 10 },
+    { name: 'Victor Garcia', pos: 'CB', ovr: 78, num: 5 },
+    { name: 'Manuel Sanchez', pos: 'LB', ovr: 78, num: 3 },
+    { name: 'Cristian Alvarez', pos: 'GK', ovr: 80, num: 13 },
+    { name: 'Pablo Campos', pos: 'CM', ovr: 78, num: 14 },
+    { name: 'Etta Eyong', pos: 'ST', ovr: 78, num: 17 },
+    { name: 'Calatrava', pos: 'CM', ovr: 77, num: 16 },
+    { name: 'K. Tonde', pos: 'ST', ovr: 77, num: 21 },
+    { name: 'Pablo Cortes', pos: 'LW', ovr: 78, num: 7 },
+    { name: 'Cabio', pos: 'CB', ovr: 77, num: 22 },
+    { name: 'Nacho Perez', pos: 'CB', ovr: 78, num: 24 },
+    { name: 'Marc Santos', pos: 'ST', ovr: 78, num: 9 }
+  ],
+  
+  'Malaga': [
+    { name: 'Alfonso Herrero', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Julian Delmas', pos: 'RB', ovr: 78, num: 2 },
+    { name: 'Juan Berrocal', pos: 'CB', ovr: 78, num: 4 },
+    { name: 'Nelson Monte', pos: 'CB', ovr: 79, num: 5 },
+    { name: 'Juan Cruz', pos: 'LB', ovr: 80, num: 17 },
+    { name: 'Pablo Martinez', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'David Lozano', pos: 'CM', ovr: 78, num: 6 },
+    { name: 'Dani Lorenzo', pos: 'CM', ovr: 78, num: 10 },
+    { name: 'Dani Romero', pos: 'ST', ovr: 78, num: 9 },
+    { name: 'Roberto Fernandez', pos: 'ST', ovr: 79, num: 19 },
+    { name: 'Rodrigo', pos: 'LW', ovr: 78, num: 11 }
+  ],
+  
+  'Racing Santander': [
+    { name: 'Aaron Escandell', pos: 'GK', ovr: 78, num: 1 },
+    { name: 'Andres Martin', pos: 'ST', ovr: 78, num: 9 },
+    { name: 'Pablo Garcia', pos: 'LW', ovr: 78, num: 11 },
+    { name: 'Andrea Almeida', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'Belousian', pos: 'CB', ovr: 77, num: 4 },
+    { name: 'Aaron Martin', pos: 'LB', ovr: 78, num: 3 }
+  ],
+  
+  'Rayo Vallecano': [
+    { name: 'Emiliano Audero', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Augusto Batalla', pos: 'GK', ovr: 80, num: 13 },
+    { name: 'Florian Lejeune', pos: 'CB', ovr: 81, num: 4 },
+    { name: 'Aridane Hernandez', pos: 'CB', ovr: 80, num: 5 },
+    { name: 'Alfonso Espino', pos: 'LB', ovr: 80, num: 3 },
+    { name: 'Ivan Balliu', pos: 'RB', ovr: 81, num: 2 },
+    { name: 'Oscar Valentin', pos: 'CDM', ovr: 81, num: 6 },
+    { name: 'Unai Lopez', pos: 'CM', ovr: 82, num: 8 },
+    { name: 'Pedro Diaz', pos: 'CM', ovr: 79, num: 16 },
+    { name: 'Alvaro Garcia', pos: 'LW', ovr: 82, num: 10 },
+    { name: 'Fran Perez', pos: 'RW', ovr: 78, num: 7 },
+    { name: 'Sergio Camello', pos: 'ST', ovr: 82, num: 9 },
+    { name: 'Almau', pos: 'ST', ovr: 78, num: 19 }
+  ],
+  
+  'Deportivo La Coruna': [
+    { name: 'Presado', pos: 'GK', ovr: 78, num: 1 },
+    { name: 'Rakan', pos: 'GK', ovr: 77, num: 13 },
+    { name: 'Alberto Molinero', pos: 'CAM', ovr: 79, num: 10 },
+    { name: 'Lucas Perez', pos: 'ST', ovr: 81, num: 9 },
+    { name: 'Antonio Cordero', pos: 'LW', ovr: 78, num: 11 },
+    { name: 'Dani Ojeda', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'David Moya', pos: 'CB', ovr: 78, num: 4 },
+    { name: 'Dani Barcia', pos: 'CM', ovr: 78, num: 6 },
+    { name: 'Kike Salas', pos: 'CB', ovr: 79, num: 5 }
+  ],
+  
+  'Espanyol': [
+    { name: 'Marko Dmitrovic', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Angel Fortuno', pos: 'GK', ovr: 78, num: 13 },
+    { name: 'Fernando Calata', pos: 'CB', ovr: 78, num: 4 },
+    { name: 'Marcos Alonso', pos: 'LB', ovr: 80, num: 17 },
+    { name: 'Roberto Fernandez', pos: 'ST', ovr: 79, num: 9 },
+    { name: 'Pere Milla', pos: 'ST', ovr: 78, num: 19 },
+    { name: 'Pol Lozano', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'Edu Exposito', pos: 'CM', ovr: 82, num: 10 },
+    { name: 'Vania', pos: 'ST', ovr: 78, num: 7 },
+    { name: 'Jofre Carreras', pos: 'LW', ovr: 79, num: 11 },
+    { name: 'Uro Kostak', pos: 'CM', ovr: 77, num: 16 },
+    { name: 'Gabriel Moscardo', pos: 'CDM', ovr: 79, num: 6 },
+    { name: 'Jose Angel', pos: 'CB', ovr: 78, num: 2 },
+    { name: 'Llorens', pos: 'CM', ovr: 78, num: 14 }
+  ],
+  
+  'Real Sociedad': [
+    { name: 'Alex Remiro', pos: 'GK', ovr: 84, num: 1 },
+    { name: 'Ayesa Marrero', pos: 'GK', ovr: 78, num: 13 },
+    { name: 'Igor Zubeldia', pos: 'CB', ovr: 82, num: 4 },
+    { name: 'Jon Pacheco', pos: 'CB', ovr: 80, num: 5 },
+    { name: 'Jon Martin', pos: 'CB', ovr: 79, num: 6 },
+    { name: 'Aihen Munoz', pos: 'LB', ovr: 80, num: 17 },
+    { name: 'Aramburu', pos: 'RB', ovr: 79, num: 2 },
+    { name: 'Sergio Gomez', pos: 'LB', ovr: 81, num: 3 },
+    { name: 'Luka Sučić', pos: 'CM', ovr: 82, num: 8 },
+    { name: 'Carlos Soler', pos: 'CM', ovr: 82, num: 10 },
+    { name: 'Torrientes', pos: 'CM', ovr: 79, num: 16 },
+    { name: 'Beitia', pos: 'CM', ovr: 78, num: 22 },
+    { name: 'Barrenetxea', pos: 'LW', ovr: 82, num: 11 },
+    { name: 'Takefusa Kubo', pos: 'RW', ovr: 85, num: 14 },
+    { name: 'Mikel Oyarzabal', pos: 'ST', ovr: 86, num: 10 },
+    { name: 'Urosar Ochin', pos: 'ST', ovr: 78, num: 19 },
+    { name: 'Oskarsson', pos: 'ST', ovr: 79, num: 9 },
+    { name: 'Zakharyan', pos: 'CAM', ovr: 82, num: 7 }
+  ],
+  
+  'Sevilla': [
+    { name: 'Odysseas Vlachodimos', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Agoume', pos: 'CM', ovr: 79, num: 6 },
+    { name: 'Suazo', pos: 'LB', ovr: 79, num: 3 },
+    { name: 'Kike Salas', pos: 'CB', ovr: 79, num: 5 },
+    { name: 'Adrian Pedrosa', pos: 'CB', ovr: 78, num: 4 },
+    { name: 'Ignacio', pos: 'CB', ovr: 78, num: 22 },
+    { name: 'Sangante', pos: 'CB', ovr: 78, num: 24 },
+    { name: 'Guridi', pos: 'CM', ovr: 79, num: 8 },
+    { name: 'Miguel Sierra', pos: 'CM', ovr: 78, num: 16 },
+    { name: 'Kochorashvili', pos: 'CM', ovr: 79, num: 10 },
+    { name: 'Fofana', pos: 'CM', ovr: 82, num: 14 },
+    { name: 'Isaac Romero', pos: 'ST', ovr: 80, num: 9 },
+    { name: 'Chukwueze', pos: 'RW', ovr: 82, num: 11 },
+    { name: 'Felix', pos: 'CM', ovr: 80, num: 7 },
+    { name: 'Rabbie Or', pos: 'ST', ovr: 78, num: 19 },
+    { name: 'Peque', pos: 'CM', ovr: 79, num: 26 },
+    { name: 'Osu', pos: 'LW', ovr: 78, num: 17 },
+    { name: 'Stasin', pos: 'ST', ovr: 78, num: 21 }
+  ],
+  
+  'Valencia': [
+    { name: 'Giorgi Mamardashvili', pos: 'GK', ovr: 85, num: 25 },
+    { name: 'Dimitrievski', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Cristhian Mosquera', pos: 'CB', ovr: 79, num: 4 },
+    { name: 'Maximo Perrone', pos: 'CDM', ovr: 79, num: 6 },
+    { name: 'Youssef Gazal', pos: 'CB', ovr: 78, num: 3 },
+    { name: 'Jesus Vazquez', pos: 'LB', ovr: 79, num: 15 },
+    { name: 'Thiago Almeida', pos: 'CM', ovr: 78, num: 8 },
+    { name: 'Javier Guerra', pos: 'CM', ovr: 79, num: 10 },
+    { name: 'Fran Perez', pos: 'RW', ovr: 78, num: 7 },
+    { name: 'Hugo Duro', pos: 'ST', ovr: 80, num: 9 },
+    { name: 'Diego Lopez', pos: 'LW', ovr: 79, num: 11 }
+  ],
+  
+  'Villarreal': [
+    { name: 'Luiz Junior', pos: 'GK', ovr: 80, num: 1 },
+    { name: 'Diego Conde', pos: 'GK', ovr: 78, num: 13 },
+    { name: 'Rafa Marin', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Logan Costa', pos: 'CB', ovr: 80, num: 5 },
+    { name: 'Pau Torres', pos: 'CB', ovr: 84, num: 3 },
+    { name: 'Sergi Cardona', pos: 'LB', ovr: 80, num: 12 },
+    { name: 'Kieran Trippier', pos: 'RB', ovr: 84, num: 2 },
+    { name: 'Denis Zakaria', pos: 'CDM', ovr: 82, num: 6 },
+    { name: 'Alex Baena', pos: 'CM', ovr: 83, num: 10 },
+    { name: 'Dani Parejo', pos: 'CM', ovr: 84, num: 8 },
+    { name: 'Yeremy Pino', pos: 'RW', ovr: 83, num: 21 },
+    { name: 'Nicolas Pepe', pos: 'RW', ovr: 81, num: 19 },
+    { name: 'Gerard Moreno', pos: 'ST', ovr: 85, num: 7 },
+    { name: 'Ayoze Perez', pos: 'ST', ovr: 81, num: 15 },
+    { name: 'Georges Mikautadze', pos: 'ST', ovr: 80, num: 9 }
+  ],
+  
+  'Girona': [
+    { name: 'Paulo Gazzaniga', pos: 'GK', ovr: 81, num: 13 },
+    { name: 'Juan Carlos', pos: 'GK', ovr: 78, num: 1 },
+    { name: 'Daley Blind', pos: 'CB', ovr: 80, num: 17 },
+    { name: 'David Lopez', pos: 'CB', ovr: 80, num: 5 },
+    { name: 'Ladislav Krejci', pos: 'CB', ovr: 80, num: 4 },
+    { name: 'Alejandro Frances', pos: 'CB', ovr: 78, num: 16 },
+    { name: 'Miguel Gutierrez', pos: 'LB', ovr: 82, num: 3 },
+    { name: 'Arnau Martinez', pos: 'RB', ovr: 82, num: 4 },
+    { name: 'Ivan Martin', pos: 'CM', ovr: 80, num: 8 },
+    { name: 'Oriol Romeu', pos: 'CDM', ovr: 80, num: 6 },
+    { name: 'Donny van de Beek', pos: 'CM', ovr: 78, num: 14 },
+    { name: 'Yaser Asprilla', pos: 'RW', ovr: 80, num: 11 },
+    { name: 'Viktor Tsygankov', pos: 'RW', ovr: 84, num: 22 },
+    { name: 'Bryan Gil', pos: 'LW', ovr: 80, num: 21 },
+    { name: 'Cristhian Stuani', pos: 'ST', ovr: 80, num: 7 },
+    { name: 'Bojan Miovski', pos: 'ST', ovr: 79, num: 9 },
+    { name: 'Abel Ruiz', pos: 'ST', ovr: 79, num: 19 }
   ]
-};
-
-// ====================================================
-// ترکیب پیش‌فرض (۱۱ نفره)
-// ====================================================
-export const DEFAULT_FORMATION = {
-  GK: 1,
-  CB: 2,
-  LB: 1,
-  RB: 1,
-  CDM: 1,
-  CM: 2,
-  CAM: 1,
-  LW: 1,
-  RW: 1,
-  ST: 1
 };
