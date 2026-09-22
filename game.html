@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>امپراتور فوتبال | بازی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-page">
+
+  <!-- ============================================
+       هدر بالا
+       ============================================ -->
+  <header class="game-header">
+    <button class="menu-btn" id="menuBtn" type="button">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="header-title">
+      <span class="header-icon">🏆</span>
+      <span class="header-name">امپراتور فوتبال</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="resource-pill">
+        <span>🪙</span>
+        <span id="coinsDisplay">0</span>
+      </div>
+      <div class="resource-pill">
+        <span>💎</span>
+        <span id="gemsDisplay">0</span>
+      </div>
+      <img id="userAvatar" class="header-avatar" src="" alt="آواتار">
+    </div>
+  </header>
+
+  <!-- ============================================
+       منوی کناری
+       ============================================ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-team">
+        <div class="sidebar-team-logo" id="sidebarTeamLogo">⚽</div>
+        <div>
+          <div class="sidebar-team-name" id="sidebarTeamName">تیم شما</div>
+          <div class="sidebar-team-league" id="sidebarTeamLeague">لیگ</div>
+        </div>
+      </div>
+      <button class="sidebar-close" id="sidebarClose" type="button">✕</button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="game.html" class="nav-item active" data-page="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">خانه</span>
+      </a>
+      <a href="news.html" class="nav-item" data-page="news">
+        <span class="nav-icon">📰</span>
+        <span class="nav-text">اخبار</span>
+      </a>
+      <a href="drama.html" class="nav-item" data-page="drama">
+        <span class="nav-icon">🎭</span>
+        <span class="nav-text">حواشی</span>
+        <span class="nav-badge" id="dramaBadge">🔥</span>
+      </a>
+      <a href="squad.html" class="nav-item" data-page="squad">
+        <span class="nav-icon">👥</span>
+        <span class="nav-text">بازیکنان</span>
+      </a>
+      <a href="formation.html" class="nav-item" data-page="formation">
+        <span class="nav-icon">⚽</span>
+        <span class="nav-text">ترکیب</span>
+      </a>
+      <a href="league.html" class="nav-item" data-page="league">
+        <span class="nav-icon">🏆</span>
+        <span class="nav-text">جدول لیگ</span>
+      </a>
+      <a href="matches.html" class="nav-item" data-page="matches">
+        <span class="nav-icon">📅</span>
+        <span class="nav-text">مسابقات</span>
+      </a>
+      <a href="transfers.html" class="nav-item" data-page="transfers">
+        <span class="nav-icon">💰</span>
+        <span class="nav-text">نقل و انتقالات</span>
+      </a>
+      <a href="doctor.html" class="nav-item" data-page="doctor">
+        <span class="nav-icon">🏥</span>
+        <span class="nav-text">دکتر</span>
+      </a>
+      <a href="training.html" class="nav-item" data-page="training">
+        <span class="nav-icon">💪</span>
+        <span class="nav-text">تمرینات</span>
+      </a>
+      <a href="press.html" class="nav-item" data-page="press">
+        <span class="nav-icon">🎤</span>
+        <span class="nav-text">کنفرانس خبری</span>
+      </a>
+      <a href="board.html" class="nav-item" data-page="board">
+        <span class="nav-icon">🏛️</span>
+        <span class="nav-text">هیات مدیره</span>
+      </a>
+      <a href="economy.html" class="nav-item" data-page="economy">
+        <span class="nav-icon">💵</span>
+        <span class="nav-text">اقتصاد باشگاه</span>
+      </a>
+      <a href="academy.html" class="nav-item" data-page="academy">
+        <span class="nav-icon">🎓</span>
+        <span class="nav-text">آکادمی جوانان</span>
+      </a>
+      <a href="stats.html" class="nav-item" data-page="stats">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">آمار و رکوردها</span>
+      </a>
+      <a href="achievements.html" class="nav-item" data-page="achievements">
+        <span class="nav-icon">🏅</span>
+        <span class="nav-text">دستاوردها</span>
+      </a>
+      <a href="newspaper.html" class="nav-item" data-page="newspaper">
+        <span class="nav-icon">🗞️</span>
+        <span class="nav-text">روزنامه</span>
+      </a>
+      <a href="settings.html" class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">تنظیمات</span>
+      </a>
+      <button class="nav-item nav-logout" id="logoutBtn" type="button">
+        <span class="nav-icon">🚪</span>
+        <span class="nav-text">خروج</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <img id="sidebarAvatar" class="sidebar-avatar" src="" alt="">
+        <div>
+          <div class="sidebar-user-name" id="sidebarUserName">مدیر</div>
+          <div class="sidebar-user-email" id="sidebarUserEmail">@user</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- پس‌زمینه تاریک وقتی منو بازه -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ============================================
+       محتوای اصلی
+       ============================================ -->
+  <main class="game-content">
+
+    <!-- کارت تیم کاربر -->
+    <section class="team-card-main" id="teamCardMain">
+      <div class="team-card-bg" id="teamCardBg"></div>
+      <div class="team-card-content">
+        <div class="team-badge" id="teamBadge">⚽</div>
+        <div class="team-info-main">
+          <h1 class="team-name-main" id="teamNameMain">تیم شما</h1>
+          <div class="team-meta">
+            <span id="teamLeagueMain">لیگ</span>
+            <span>•</span>
+            <span id="teamRankMain">رتبه -</span>
+          </div>
+          <div class="team-goal">
+            <span>🎯</span>
+            <span id="teamGoalMain">هدف فصل</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- شمارش معکوس بازی بعدی -->
+    <section class="next-match-section">
+      <div class="section-title">
+        <span>⏰</span>
+        <span>بازی بعدی</span>
+      </div>
+
+      <div class="next-match-card">
+        <div class="match-countdown" id="matchCountdown">
+          <div class="countdown-item">
+            <div class="countdown-value" id="daysLeft">۰</div>
+            <div class="countdown-label">روز</div>
+          </div>
+          <div class="countdown-item">
+            <div class="countdown-value" id="hoursLeft">۰۰</div>
+            <div class="countdown-label">ساعت</div>
+          </div>
+          <div class="countdown-item">
+            <div class="countdown-value" id="minutesLeft">۰۰</div>
+            <div class="countdown-label">دقیقه</div>
+          </div>
+          <div class="countdown-item">
+            <div class="countdown-value" id="secondsLeft">۰۰</div>
+            <div class="countdown-label">ثانیه</div>
+          </div>
+        </div>
+
+        <div class="match-teams" id="matchTeams">
+          <div class="match-team home">
+            <div class="match-team-logo" id="homeTeamLogo">🏠</div>
+            <div class="match-team-name" id="homeTeamName">تیم شما</div>
+          </div>
+          <div class="match-vs">VS</div>
+          <div class="match-team away">
+            <div class="match-team-logo" id="awayTeamLogo">✈️</div>
+            <div class="match-team-name" id="awayTeamName">رقیب</div>
+          </div>
+        </div>
+
+        <div class="match-info-bar">
+          <span>🏟️ <span id="matchStadium">استادیوم</span></span>
+          <span>📅 <span id="matchDate">تاریخ</span></span>
+          <span>🏆 هفته <span id="matchWeek">۱</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- اخبار سریع -->
+    <section class="news-ticker-section">
+      <div class="section-title">
+        <span>📰</span>
+        <span>آخرین اخبار</span>
+        <a href="news.html" class="see-all">مشاهده همه ←</a>
+      </div>
+
+      <div class="news-ticker">
+        <div class="news-ticker-content" id="newsTicker">
+          <div class="news-loading">در حال بارگذاری اخبار...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- آمار سریع -->
+    <section class="quick-stats-section">
+      <div class="section-title">
+        <span>📊</span>
+        <span>آمار فصل</span>
+      </div>
+
+      <div class="quick-stats-grid">
+        <div class="quick-stat">
+          <div class="quick-stat-icon">🎯</div>
+          <div class="quick-stat-value" id="statPlayed">0</div>
+          <div class="quick-stat-label">بازی</div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-stat-icon">✅</div>
+          <div class="quick-stat-value" id="statWins">0</div>
+          <div class="quick-stat-label">برد</div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-stat-icon">⚖️</div>
+          <div class="quick-stat-value" id="statDraws">0</div>
+          <div class="quick-stat-label">تساوی</div>
+        </div>
+        <div class="quick-stat">
+          <div class="quick-stat-icon">❌</div>
+          <div class="quick-stat-value" id="statLosses">0</div>
+          <div class="quick-stat-label">باخت</div>
+        </div>
+        <div class="quick-stat highlight">
+          <div class="quick-stat-icon">🏆</div>
+          <div class="quick-stat-value" id="statPoints">0</div>
+          <div class="quick-stat-label">امتیاز</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- لینک‌های سریع -->
+    <section class="quick-actions-section">
+      <div class="section-title">
+        <span>⚡</span>
+        <span>دسترسی سریع</span>
+      </div>
+
+      <div class="quick-actions-grid">
+        <a href="squad.html" class="quick-action">
+          <div class="quick-action-icon">👥</div>
+          <div class="quick-action-text">بازیکنان</div>
+        </a>
+        <a href="formation.html" class="quick-action">
+          <div class="quick-action-icon">⚽</div>
+          <div class="quick-action-text">ترکیب</div>
+        </a>
+        <a href="transfers.html" class="quick-action">
+          <div class="quick-action-icon">💰</div>
+          <div class="quick-action-text">نقل و انتقالات</div>
+        </a>
+        <a href="league.html" class="quick-action">
+          <div class="quick-action-icon">🏆</div>
+          <div class="quick-action-text">جدول لیگ</div>
+        </a>
+        <a href="press.html" class="quick-action">
+          <div class="quick-action-icon">🎤</div>
+          <div class="quick-action-text">کنفرانس</div>
+        </a>
+        <a href="training.html" class="quick-action">
+          <div class="quick-action-icon">💪</div>
+          <div class="quick-action-text">تمرین</div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- لودینگ -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loader-ball">⚽</div>
+    <p>در حال بارگذاری...</p>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+  </html>
