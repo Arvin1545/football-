@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>بازیکنان | امپراتور فوتبال</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/squad.css">
+</head>
+<body class="game-page">
+
+  <!-- هدر -->
+  <header class="game-header">
+    <a href="game.html" class="menu-btn back-btn-header">
+      <span>→</span>
+    </a>
+
+    <div class="header-title">
+      <span class="header-icon">👥</span>
+      <span class="header-name">بازیکنان</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="resource-pill">
+        <span>🪙</span>
+        <span id="coinsDisplay">0</span>
+      </div>
+      <div class="resource-pill">
+        <span>💎</span>
+        <span id="gemsDisplay">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- آمار کلی تیم -->
+  <section class="squad-summary">
+    <div class="summary-card">
+      <div class="summary-icon">👥</div>
+      <div class="summary-value" id="totalPlayers">0</div>
+      <div class="summary-label">بازیکن</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon">⭐</div>
+      <div class="summary-value" id="avgOverall">0</div>
+      <div class="summary-label">میانگین</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon">💰</div>
+      <div class="summary-value" id="totalValue">0</div>
+      <div class="summary-label">ارزش تیم</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon">🏆</div>
+      <div class="summary-value" id="topPlayer">-</div>
+      <div class="summary-label">بهترین</div>
+    </div>
+  </section>
+
+  <!-- فیلترها -->
+  <section class="squad-filters">
+    <button class="filter-btn active" data-filter="all">
+      <span>🌐</span>
+      <span>همه</span>
+    </button>
+    <button class="filter-btn" data-filter="GK">
+      <span>🧤</span>
+      <span>GK</span>
+    </button>
+    <button class="filter-btn" data-filter="DEF">
+      <span>🛡️</span>
+      <span>مدافع</span>
+    </button>
+    <button class="filter-btn" data-filter="MID">
+      <span>⚙️</span>
+      <span>هافبک</span>
+    </button>
+    <button class="filter-btn" data-filter="ATT">
+      <span>⚽</span>
+      <span>مهاجم</span>
+    </button>
+    <button class="filter-btn" data-filter="starter">
+      <span>✅</span>
+      <span>ترکیب اصلی</span>
+    </button>
+    <button class="filter-btn" data-filter="bench">
+      <span>🪑</span>
+      <span>نیمکت</span>
+    </button>
+  </section>
+
+  <!-- ترتیب‌دهی -->
+  <section class="squad-sort">
+    <label>ترتیب:</label>
+    <select id="sortSelect">
+      <option value="overall-desc">اورال (بالا به پایین)</option>
+      <option value="overall-asc">اورال (پایین به بالا)</option>
+      <option value="position">پست</option>
+      <option value="age-asc">سن (کمتر)</option>
+      <option value="age-desc">سن (بیشتر)</option>
+      <option value="value-desc">ارزش (بالا)</option>
+    </select>
+  </section>
+
+  <!-- لیست بازیکنان -->
+  <main class="players-grid" id="playersGrid">
+    <div class="loading-state">
+      <div class="loader-ball">⚽</div>
+      <p>در حال بارگذاری بازیکنان...</p>
+    </div>
+  </main>
+
+  <!-- مودال بازیکن -->
+  <div id="playerModal" class="player-modal" hidden>
+    <div class="player-modal-content">
+      <button class="player-modal-close" id="playerModalClose">✕</button>
+      
+      <div class="player-modal-header" id="playerModalHeader">
+        <div class="player-modal-photo" id="playerModalPhoto">👤</div>
+        <div class="player-modal-basic">
+          <h2 id="playerModalName">-</h2>
+          <div class="player-modal-position" id="playerModalPosition">-</div>
+          <div class="player-modal-overall" id="playerModalOverall">-</div>
+        </div>
+      </div>
+
+      <div class="player-modal-body">
+        <!-- Stats -->
+        <div class="player-modal-section">
+          <h3>📊 مهارت‌ها</h3>
+          <div class="player-stats-grid" id="playerStatsGrid"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="player-modal-section">
+          <h3>📋 اطلاعات</h3>
+          <div class="player-info-grid" id="playerInfoGrid"></div>
+        </div>
+
+        <!-- Stats Total -->
+        <div class="player-modal-section">
+          <h3>🏆 آمار فصل</h3>
+          <div class="player-total-grid" id="playerTotalGrid"></div>
+        </div>
+      </div>
+
+      <div class="player-modal-actions">
+        <button class="modal-btn primary" id="actionBtn">✅ در ترکیب</button>
+        <button class="modal-btn danger" id="sellBtn">💰 فروش</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- لودینگ -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loader-ball">⚽</div>
+    <p>در حال بارگذاری...</p>
+  </div>
+
+  <script type="module" src="js/squad.js"></script>
+</body>
+                                            </html>
