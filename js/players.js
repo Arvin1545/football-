@@ -1,8 +1,9 @@
 // players.js
-// مدیریت بازیکنان + عکس خودکار از API
+// مدیریت بازیکنان + عکس + خوشحالی
 
 import { supabase } from './supabase-client.js';
 import { PLAYERS_DATA } from './players-data.js';
+import { getPlayerCelebration, STAR_CELEBRATIONS } from './celebrations.js';
 
 // ====================================================
 // گرفتن عکس از API (TheSportsDB)
@@ -14,7 +15,6 @@ export async function getPlayerPhoto(playerName) {
     const data = await response.json();
     
     if (data.player && data.player[0]) {
-      // عکس بازیکن
       return data.player[0].strThumb || 
              data.player[0].strCutout || 
              data.player[0].strRender || 
@@ -22,7 +22,7 @@ export async function getPlayerPhoto(playerName) {
     }
     return null;
   } catch (error) {
-    console.warn('خطا در API:', error);
+    console.warn('API خطا:', error);
     return null;
   }
 }
@@ -45,27 +45,39 @@ export async function getTeamPlayers(teamId) {
 }
 
 // ====================================================
-// ساخت بازیکنان یک تیم
+// گرفتن یه بازیکن
+// ====================================================
+export async function getPlayerById(playerId) {
+  const { data, error } = await supabase
+    .from('players')
+    .select('*')
+    .eq('id', playerId)
+    .maybeSingle();
+  
+  if (error) return null;
+  return data;
+}
+
+// ====================================================
+// ساخت بازیکنان یک تیم (فقط از players-data.js)
 // ====================================================
 export async function createPlayersForTeam(teamId, teamName) {
-  // چک کن قبلاً ساخته شده
   const existing = await getTeamPlayers(teamId);
   if (existing.length > 0) {
     console.log('✅ بازیکنان قبلاً ساخته شدن');
     return existing;
   }
   
-  // اسم بازیکنان
-  const playersList = PLAYERS_DATA[teamName] || [];
+  // فقط از data می‌خونیم — هیچ بازیکن جعلی ساخته نمی‌شه
+  const playersList = PLAYERS_DATA[teamName];
   
-  if (playersList.length === 0) {
-    console.log('⚠️ بازیکنان برای', teamName, 'نیست');
+  if (!playersList || playersList.length === 0) {
+    console.warn('⚠️ بازیکنی برای تیم', teamName, 'توی دیتا پیدا نشد');
     return [];
   }
   
-  console.log('🔵 ساخت بازیکنان برای:', teamName);
+  console.log('🔵 ساخت', playersList.length, 'بازیکن برای:', teamName);
   
-  // آماده‌سازی داده‌ها
   const players = playersList.map((p, i) => ({
     name: p.name,
     display_name: p.name,
@@ -80,7 +92,7 @@ export async function createPlayersForTeam(teamId, teamName) {
     defending: Math.max(50, Math.min(99, p.ovr - 5 + Math.floor(Math.random() * 10))),
     physical: Math.max(50, Math.min(99, p.ovr - 4 + Math.floor(Math.random() * 8))),
     shirt_number: p.num || (i + 1),
-    photo_url: null, // بعداً از API می‌گیریم
+    photo_url: null,
     team_id: teamId,
     is_starter: i < 11
   }));
@@ -91,16 +103,14 @@ export async function createPlayersForTeam(teamId, teamName) {
     .select();
   
   if (error) {
-    console.error('❌ خطا در ساخت بازیکنان:', error);
+    console.error('❌ خطا:', error);
     throw error;
   }
   
   console.log('✅', data.length, 'بازیکن ساخته شد');
   
-  // گرفتن عکس‌ها در پس‌زمینه
-  setTimeout(() => {
-    loadAllPhotos(data);
-  }, 100);
+  // گرفتن عکس‌ها
+  setTimeout(() => loadAllPhotos(data), 100);
   
   return data;
 }
@@ -119,13 +129,8 @@ async function loadAllPhotos(players) {
         .from('players')
         .update({ photo_url: photo })
         .eq('id', player.id);
-      
-      console.log('✅ عکس گرفته شد:', player.name);
-    } else {
-      console.log('⚠️ عکس نیافتاد:', player.name);
     }
     
-    // تاخیر برای جلوگیری از محدودیت API
     await new Promise(r => setTimeout(r, 300));
   }
   
@@ -152,4 +157,34 @@ export function getPositionColor(pos) {
   if (['CDM', 'CM', 'CAM'].includes(pos)) return '#10b981';
   if (['LW', 'RW', 'ST'].includes(pos)) return '#ef4444';
   return '#6b7280';
+}
+
+// ====================================================
+// اسم پست (انگلیسی)
+// ====================================================
+export function getPositionName(pos) {
+  return pos;
+}
+
+// ====================================================
+// گرفتن خوشحالی بازیکن
+// ====================================================
+export function getCelebration(playerName) {
+  return getPlayerCelebration(playerName);
+}
+
+// ====================================================
+// آیا بازیکن ستاره‌ست؟
+// ====================================================
+export function isStarPlayer(playerName) {
+  return !!STAR_CELEBRATIONS[playerName];
+}
+
+// ====================================================
+// فرمت قیمت
+// ====================================================
+export function formatMoney(num) {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M €';
+  if (num >= 1000) return (num / 1000).toFixed(0) + 'K €';
+  return num + ' €';
 }
