@@ -4,6 +4,7 @@
 import { supabase } from './supabase-client.js';
 import { PLAYERS_DATA } from './players-data.js';
 import { getPlayerCelebration, STAR_CELEBRATIONS } from './celebrations.js';
+import { toEnglishTeamName } from './team-name-map.js';
 
 // ====================================================
 // گرفتن عکس از API (TheSportsDB)
@@ -68,11 +69,15 @@ export async function createPlayersForTeam(teamId, teamName) {
     return existing;
   }
   
-  // فقط از data می‌خونیم — هیچ بازیکن جعلی ساخته نمی‌شه
-  const playersList = PLAYERS_DATA[teamName];
+  // تبدیل اسم فارسی به انگلیسی
+  const englishName = toEnglishTeamName(teamName);
+  console.log('🔄 تبدیل:', teamName, '→', englishName);
+  
+  // گرفتن از data — هیچ بازیکن جعلی ساخته نمی‌شه
+  const playersList = PLAYERS_DATA[englishName];
   
   if (!playersList || playersList.length === 0) {
-    console.warn('⚠️ بازیکنی برای تیم', teamName, 'توی دیتا پیدا نشد');
+    console.warn('⚠️ بازیکنی برای تیم', teamName, '(' + englishName + ') توی دیتا پیدا نشد');
     return [];
   }
   
