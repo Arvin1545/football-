@@ -1,5 +1,5 @@
 // players.js
-// مدیریت بازیکنان + عکس چند-منبعی + خوشحالی
+// مدیریت بازیکنان + عکس چند-منبعی
 
 import { supabase } from './supabase-client.js';
 import { PLAYERS_DATA } from './players-data.js';
@@ -7,9 +7,7 @@ import { getPlayerCelebration, STAR_CELEBRATIONS } from './celebrations.js';
 import { toEnglishTeamName } from './team-name-map.js';
 import { getPlayerPhoto, generateAvatar, loadAllPlayerPhotos } from './player-photos.js';
 
-// ====================================================
 // گرفتن بازیکنان یک تیم
-// ====================================================
 export async function getTeamPlayers(teamId) {
   const { data, error } = await supabase
     .from('players')
@@ -24,9 +22,7 @@ export async function getTeamPlayers(teamId) {
   return data || [];
 }
 
-// ====================================================
 // گرفتن یه بازیکن
-// ====================================================
 export async function getPlayerById(playerId) {
   const { data, error } = await supabase
     .from('players')
@@ -38,9 +34,7 @@ export async function getPlayerById(playerId) {
   return data;
 }
 
-// ====================================================
 // ساخت بازیکنان یک تیم
-// ====================================================
 export async function createPlayersForTeam(teamId, teamName, teamData = null) {
   const existing = await getTeamPlayers(teamId);
   if (existing.length > 0) {
@@ -48,14 +42,13 @@ export async function createPlayersForTeam(teamId, teamName, teamData = null) {
     return existing;
   }
   
-  // تبدیل اسم فارسی به انگلیسی
   const englishName = toEnglishTeamName(teamName);
   console.log('🔄 تبدیل:', teamName, '→', englishName);
   
   const playersList = PLAYERS_DATA[englishName];
   
   if (!playersList || playersList.length === 0) {
-    console.warn('⚠️ بازیکنی برای', teamName, '(' + englishName + ') پیدا نشد');
+    console.warn('⚠️ بازیکنی برای', teamName, 'پیدا نشد');
     return [];
   }
   
@@ -94,7 +87,6 @@ export async function createPlayersForTeam(teamId, teamName, teamData = null) {
   
   // بارگذاری عکس‌ها
   setTimeout(async () => {
-    // گرفتن اطلاعات تیم
     let team = teamData;
     if (!team) {
       const { data: t } = await supabase
@@ -105,10 +97,8 @@ export async function createPlayersForTeam(teamId, teamName, teamData = null) {
       team = t;
     }
     
-    // بارگذاری عکس‌ها
     const photos = await loadAllPlayerPhotos(data, team);
     
-    // ذخیره در دیتابیس
     for (const item of photos) {
       if (item.photo) {
         await supabase
@@ -124,9 +114,7 @@ export async function createPlayersForTeam(teamId, teamName, teamData = null) {
   return data;
 }
 
-// ====================================================
 // رنگ اورال
-// ====================================================
 export function getOverallTier(overall) {
   if (overall >= 90) return { tier: 'legendary', color: '#fbbf24', label: 'Legendary' };
   if (overall >= 85) return { tier: 'epic', color: '#a855f7', label: 'Epic' };
@@ -135,9 +123,7 @@ export function getOverallTier(overall) {
   return { tier: 'bronze', color: '#cd7f32', label: 'Bronze' };
 }
 
-// ====================================================
 // رنگ پست
-// ====================================================
 export function getPositionColor(pos) {
   if (pos === 'GK') return '#f59e0b';
   if (['CB', 'LB', 'RB'].includes(pos)) return '#3b82f6';
@@ -146,16 +132,8 @@ export function getPositionColor(pos) {
   return '#6b7280';
 }
 
-// ====================================================
-// اسم پست
-// ====================================================
-export function getPositionName(pos) {
-  return pos;
-}
+export function getPositionName(pos) { return pos; }
 
-// ====================================================
-// خوشحالی
-// ====================================================
 export function getCelebration(playerName) {
   return getPlayerCelebration(playerName);
 }
@@ -164,21 +142,14 @@ export function isStarPlayer(playerName) {
   return !!STAR_CELEBRATIONS[playerName];
 }
 
-// ====================================================
-// فرمت قیمت
-// ====================================================
 export function formatMoney(num) {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M €';
   if (num >= 1000) return (num / 1000).toFixed(0) + 'K €';
   return num + ' €';
 }
 
-// ====================================================
-// رفرش عکس‌های یک تیم (اگه قبلاً ساخته شدن)
-// ====================================================
+// رفرش عکس‌های تیم
 export async function refreshTeamPhotos(teamId) {
-  console.log('🔄 رفرش عکس‌ها...');
-  
   const players = await getTeamPlayers(teamId);
   const { data: team } = await supabase
     .from('teams')
@@ -197,6 +168,5 @@ export async function refreshTeamPhotos(teamId) {
     }
   }
   
-  console.log('✅ عکس‌ها رفرش شد');
   return photos;
 }
