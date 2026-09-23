@@ -1,32 +1,11 @@
 // players.js
-// مدیریت بازیکنان + عکس + خوشحالی
+// مدیریت بازیکنان + عکس چند-منبعی + خوشحالی
 
 import { supabase } from './supabase-client.js';
 import { PLAYERS_DATA } from './players-data.js';
 import { getPlayerCelebration, STAR_CELEBRATIONS } from './celebrations.js';
 import { toEnglishTeamName } from './team-name-map.js';
-
-// ====================================================
-// گرفتن عکس از API (TheSportsDB)
-// ====================================================
-export async function getPlayerPhoto(playerName) {
-  try {
-    const url = `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(playerName)}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.player && data.player[0]) {
-      return data.player[0].strThumb || 
-             data.player[0].strCutout || 
-             data.player[0].strRender || 
-             null;
-    }
-    return null;
-  } catch (error) {
-    console.warn('API خطا:', error);
-    return null;
-  }
-}
+import { getPlayerPhoto, generateAvatar, loadAllPlayerPhotos } from './player-photos.js';
 
 // ====================================================
 // گرفتن بازیکنان یک تیم
@@ -60,9 +39,9 @@ export async function getPlayerById(playerId) {
 }
 
 // ====================================================
-// ساخت بازیکنان یک تیم (فقط از players-data.js)
+// ساخت بازیکنان یک تیم
 // ====================================================
-export async function createPlayersForTeam(teamId, teamName) {
+export async function createPlayersForTeam(teamId, teamName, teamData = null) {
   const existing = await getTeamPlayers(teamId);
   if (existing.length > 0) {
     console.log('✅ بازیکنان قبلاً ساخته شدن');
@@ -73,15 +52,14 @@ export async function createPlayersForTeam(teamId, teamName) {
   const englishName = toEnglishTeamName(teamName);
   console.log('🔄 تبدیل:', teamName, '→', englishName);
   
-  // گرفتن از data — هیچ بازیکن جعلی ساخته نمی‌شه
   const playersList = PLAYERS_DATA[englishName];
   
   if (!playersList || playersList.length === 0) {
-    console.warn('⚠️ بازیکنی برای تیم', teamName, '(' + englishName + ') توی دیتا پیدا نشد');
+    console.warn('⚠️ بازیکنی برای', teamName, '(' + englishName + ') پیدا نشد');
     return [];
   }
   
-  console.log('🔵 ساخت', playersList.length, 'بازیکن برای:', teamName);
+  console.log('🔵 ساخت', playersList.length, 'بازیکن...');
   
   const players = playersList.map((p, i) => ({
     name: p.name,
@@ -114,32 +92,36 @@ export async function createPlayersForTeam(teamId, teamName) {
   
   console.log('✅', data.length, 'بازیکن ساخته شد');
   
-  // گرفتن عکس‌ها
-  setTimeout(() => loadAllPhotos(data), 100);
-  
-  return data;
-}
-
-// ====================================================
-// بارگذاری عکس‌ها
-// ====================================================
-async function loadAllPhotos(players) {
-  console.log('📸 شروع بارگذاری عکس‌ها...');
-  
-  for (const player of players) {
-    const photo = await getPlayerPhoto(player.name);
-    
-    if (photo) {
-      await supabase
-        .from('players')
-        .update({ photo_url: photo })
-        .eq('id', player.id);
+  // بارگذاری عکس‌ها
+  setTimeout(async () => {
+    // گرفتن اطلاعات تیم
+    let team = teamData;
+    if (!team) {
+      const { data: t } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('id', teamId)
+        .single();
+      team = t;
     }
     
-    await new Promise(r => setTimeout(r, 300));
-  }
+    // بارگذاری عکس‌ها
+    const photos = await loadAllPlayerPhotos(data, team);
+    
+    // ذخیره در دیتابیس
+    for (const item of photos) {
+      if (item.photo) {
+        await supabase
+          .from('players')
+          .update({ photo_url: item.photo })
+          .eq('id', item.id);
+      }
+    }
+    
+    console.log('✅ عکس‌ها ذخیره شد');
+  }, 100);
   
-  console.log('✅ همه عکس‌ها گرفته شد');
+  return data;
 }
 
 // ====================================================
@@ -165,22 +147,19 @@ export function getPositionColor(pos) {
 }
 
 // ====================================================
-// اسم پست (انگلیسی)
+// اسم پست
 // ====================================================
 export function getPositionName(pos) {
   return pos;
 }
 
 // ====================================================
-// گرفتن خوشحالی بازیکن
+// خوشحالی
 // ====================================================
 export function getCelebration(playerName) {
   return getPlayerCelebration(playerName);
 }
 
-// ====================================================
-// آیا بازیکن ستاره‌ست؟
-// ====================================================
 export function isStarPlayer(playerName) {
   return !!STAR_CELEBRATIONS[playerName];
 }
@@ -192,4 +171,32 @@ export function formatMoney(num) {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M €';
   if (num >= 1000) return (num / 1000).toFixed(0) + 'K €';
   return num + ' €';
+}
+
+// ====================================================
+// رفرش عکس‌های یک تیم (اگه قبلاً ساخته شدن)
+// ====================================================
+export async function refreshTeamPhotos(teamId) {
+  console.log('🔄 رفرش عکس‌ها...');
+  
+  const players = await getTeamPlayers(teamId);
+  const { data: team } = await supabase
+    .from('teams')
+    .select('*')
+    .eq('id', teamId)
+    .single();
+  
+  const photos = await loadAllPlayerPhotos(players, team);
+  
+  for (const item of photos) {
+    if (item.photo) {
+      await supabase
+        .from('players')
+        .update({ photo_url: item.photo })
+        .eq('id', item.id);
+    }
+  }
+  
+  console.log('✅ عکس‌ها رفرش شد');
+  return photos;
 }
