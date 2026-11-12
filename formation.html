@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ترکیب | امپراتور فوتبال</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/game.css">
+  <link rel="stylesheet" href="css/formation.css">
+</head>
+<body class="game-page formation-page">
+
+  <!-- هدر -->
+  <header class="game-header">
+    <a href="game.html" class="menu-btn back-btn-header">
+      <span>→</span>
+    </a>
+
+    <div class="header-title">
+      <span class="header-icon">⚽</span>
+      <span class="header-name">ترکیب</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="save-btn" id="saveBtn" type="button">
+        💾 ذخیره
+      </button>
+    </div>
+  </header>
+
+  <!-- نوار انتخاب آرایش -->
+  <section class="formation-selector">
+    <div class="formation-buttons">
+      <button class="formation-btn active" data-formation="4-3-3">4-3-3</button>
+      <button class="formation-btn" data-formation="4-4-2">4-4-2</button>
+      <button class="formation-btn" data-formation="3-5-2">3-5-2</button>
+    </div>
+    
+    <!-- آمار ترکیب -->
+    <div class="team-stats">
+      <div class="stat-box def">
+        <span class="stat-label">DEF</span>
+        <span class="stat-value" id="statDef">0</span>
+      </div>
+      <div class="stat-box mid">
+        <span class="stat-label">MID</span>
+        <span class="stat-value" id="statMid">0</span>
+      </div>
+      <div class="stat-box att">
+        <span class="stat-label">ATT</span>
+        <span class="stat-value" id="statAtt">0</span>
+      </div>
+      <div class="stat-box ovr">
+        <span class="stat-label">OVR</span>
+        <span class="stat-value" id="statOvr">0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- زمین فوتبال -->
+  <section class="pitch-container">
+    <div class="pitch" id="pitch">
+      <!-- جایگاه‌ها اینجا ساخته می‌شن -->
+    </div>
+  </section>
+
+  <!-- نیمکت -->
+  <section class="bench-section">
+    <div class="bench-header">
+      <h3>🪑 نیمکت</h3>
+      <span class="bench-count" id="benchCount">0</span>
+    </div>
+    <div class="bench-list" id="benchList">
+      <div class="loading-state">
+        <div class="loader-ball">⚽</div>
+        <p>در حال بارگذاری...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- مودال انتخاب بازیکن -->
+  <div id="selectModal" class="select-modal" hidden>
+    <div class="select-modal-content">
+      <div class="select-modal-header">
+        <h2 id="selectModalTitle">انتخاب بازیکن</h2>
+        <button class="close-modal-btn" id="closeSelectModal">✕</button>
+      </div>
+      <div class="select-modal-list" id="selectModalList">
+        <!-- لیست بازیکنان -->
+      </div>
+    </div>
+  </div>
+
+  <!-- لودینگ -->
+  <div id="loadingOverlay" class="loading-overlay" hidden>
+    <div class="loader-ball">⚽</div>
+    <p id="loadingText">در حال بارگذاری...</p>
+  </div>
+
+  <script type="module" src="js/formation.js"></script>
+</body>
+</html>
