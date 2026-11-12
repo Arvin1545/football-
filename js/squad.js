@@ -1,6 +1,6 @@
 // squad.js
 // منطق صفحه بازیکنان
-
+import { renderPlayerCard } from './player-cards.js';
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { 
