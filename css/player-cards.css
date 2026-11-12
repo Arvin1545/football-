@@ -1,0 +1,260 @@
+/* ====================================================
+   player-cards.css — کارت بازیکنان گرافیکی
+   ==================================================== */
+
+.player-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  aspect-ratio: 3 / 4;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.player-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* پس‌زمینه گرادیانت با رنگ تیم */
+.player-card-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--team-primary, #7c3aed) 0%,
+    var(--team-secondary, #ec4899) 100%
+  );
+  z-index: 0;
+}
+
+/* افکت نور */
+.player-card-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top right,
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 60%
+  );
+}
+
+/* محتوا */
+.player-card-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  color: white;
+}
+
+/* ====================================================
+   بالای کارت: اورال + پست
+   ==================================================== */
+
+.player-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.player-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-size: 24px;
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 10px;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.ovr-label {
+  font-size: 8px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.player-position {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ====================================================
+   وسط کارت: آرم تیم + اسم
+   ==================================================== */
+
+.player-card-middle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.team-emblem {
+  font-size: 40px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  animation: emblemFloat 3s ease-in-out infinite;
+}
+
+@keyframes emblemFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.player-name-large {
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+  padding: 0 4px;
+  word-wrap: break-word;
+}
+
+/* ====================================================
+   پایین کارت: شماره + اطلاعات
+   ==================================================== */
+
+.player-card-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.shirt-number {
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.player-mini-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* ====================================================
+   بج ترکیب اصلی
+   ==================================================== */
+
+.starter-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 16px;
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* ====================================================
+   کارت‌های خاص (بر اساس اورال)
+   ==================================================== */
+
+/* افسانه‌ای (90+) */
+.player-card[data-tier="legendary"] {
+  border-color: #fbbf24;
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+}
+
+.player-card[data-tier="legendary"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(251, 191, 36, 0.2) 50%, transparent 70%);
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+  border-radius: 16px;
+  z-index: 2;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* نخبه (85-89) */
+.player-card[data-tier="epic"] {
+  border-color: #a855f7;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.3);
+}
+
+/* طلایی (80-84) */
+.player-card[data-tier="gold"] {
+  border-color: #f59e0b;
+}
+
+/* نقره‌ای (75-79) */
+.player-card[data-tier="silver"] {
+  border-color: #94a3b8;
+}
+
+/* برنزی */
+.player-card[data-tier="bronze"] {
+  border-color: #cd7f32;
+}
+
+/* ====================================================
+   حالت افقی — موبایل
+   ==================================================== */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .player-card {
+    border-radius: 12px;
+  }
+  
+  .player-card-content {
+    padding: 6px;
+  }
+  
+  .player-overall {
+    font-size: 18px;
+    padding: 4px 8px;
+  }
+  
+  .ovr-label { font-size: 7px; }
+  .player-position { font-size: 9px; padding: 3px 6px; }
+  .team-emblem { font-size: 28px; }
+  .player-name-large { font-size: 11px; }
+  .shirt-number { font-size: 24px; }
+  .player-mini-info { font-size: 8px; }
+}
+
+/* ====================================================
+   موبایل عمودی
+   ==================================================== */
+
+@media (max-width: 640px) and (orientation: portrait) {
+  .player-overall { font-size: 20px; }
+  .team-emblem { font-size: 32px; }
+  .player-name-large { font-size: 12px; }
+  .shirt-number { font-size: 28px; }
+}
