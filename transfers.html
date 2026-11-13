@@ -90,17 +90,21 @@
             <span>💰 قیمت پایه:</span>
             <strong id="bidBasePrice">0</strong>
           </div>
+          <div class="bid-info-row">
+            <span>📈 بالاترین پیشنهاد:</span>
+            <strong id="bidHighestPrice">0</strong>
+          </div>
         </div>
         <div class="price-section">
-          <label class="price-label">💵 پیشنهاد شما (بالاتر از قیمت پایه)</label>
+          <label class="price-label">💵 پیشنهاد شما (باید بالاتر از بالاترین باشد)</label>
           <div class="price-display">
             <span id="bidAmountDisplay">0</span>
             <span class="currency">€</span>
           </div>
           <input type="range" id="bidAmountSlider" min="0" max="100000000" step="1000000" value="10000000" class="price-slider">
           <div class="price-range-labels">
-            <span>متوسط</span>
-            <span>بالا</span>
+            <span>قیمت پایه</span>
+            <span>بالاتر</span>
             <span>خیلی بالا</span>
           </div>
         </div>
