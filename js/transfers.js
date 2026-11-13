@@ -5,6 +5,7 @@ import { formatMoney, getPositionColor } from './players.js';
 const els = {
   coinsDisplay: document.getElementById('coinsDisplay'),
   marketList: document.getElementById('marketList'),
+  myBidsList: document.getElementById('myBidsList'),
   loadingOverlay: document.getElementById('loadingOverlay'),
   bidModal: document.getElementById('bidModal'),
   closeBidModal: document.getElementById('closeBidModal'),
@@ -24,6 +25,7 @@ let allMarketPlayers = [];
 let filteredMarketPlayers = [];
 let selectedPlayerToBuy = null;
 let currentPosFilter = 'all';
+let myBids = [];
 
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -42,7 +44,19 @@ async function init() {
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(currentUser.profile?.coins || 1000);
 
   await loadMarket();
+  await loadMyBids();
   els.loadingOverlay.hidden = true;
+
+  // تب‌ها
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      const tabContent = document.getElementById(btn.dataset.tab + 'Tab');
+      if (tabContent) tabContent.classList.add('active');
+    });
+  });
 
   // فیلتر پست‌ها
   document.querySelectorAll('.pos-btn').forEach(btn => {
@@ -55,23 +69,24 @@ async function init() {
   });
 }
 
+// ====================================================
+// بازار
+// ====================================================
 async function loadMarket() {
   if (!currentTeam) {
     els.marketList.innerHTML = `<div class="empty-market"><h3>تیم ندارید</h3></div>`;
     return;
   }
 
-  // گرفتن تیم‌های خارج از لیگ کاربر
   const { data: otherTeams } = await supabase.from('teams').select('id').neq('league', currentTeam.league);
   if (!otherTeams) return;
   const teamIds = otherTeams.map(t => t.id);
 
-  // گرفتن بازیکنان
   const { data: players } = await supabase
     .from('players')
     .select(`*, team:team_id(name, league)`)
     .in('team_id', teamIds)
-    .limit(100); // گرفتن ۱۰۰ بازیکن برای تنوع پست‌ها
+    .limit(100);
 
   if (!players) return;
   
@@ -85,7 +100,6 @@ function filterMarket() {
   } else {
     filteredMarketPlayers = allMarketPlayers.filter(p => p.position === currentPosFilter).sort((a,b) => b.overall - a.overall).slice(0, 20);
   }
-  
   renderMarket();
 }
 
@@ -122,6 +136,9 @@ function renderMarket() {
   });
 }
 
+// ====================================================
+// مودال پیشنهاد
+// ====================================================
 function openBidModal(playerId) {
   const player = allMarketPlayers.find(p => p.id === playerId);
   if (!player) return;
@@ -134,7 +151,6 @@ function openBidModal(playerId) {
   els.bidMeta.textContent = `${player.position} • ${player.overall} OVR`;
   els.bidBasePrice.textContent = formatMoney(price);
 
-  // اسلایدر از قیمت پایه شروع میشه
   els.bidAmountSlider.min = price;
   els.bidAmountSlider.max = Math.floor(price * 2);
   els.bidAmountSlider.value = price;
@@ -161,7 +177,7 @@ els.placeBid?.addEventListener('click', async () => {
 
   try {
     const endsAt = new Date();
-    endsAt.setHours(endsAt.getHours() + 10); // ۱۰ ساعت
+    endsAt.setHours(endsAt.getHours() + 10);
 
     const { error } = await supabase.from('transfer_listings').insert({
       player_id: selectedPlayerToBuy.id,
@@ -177,6 +193,15 @@ els.placeBid?.addEventListener('click', async () => {
 
     if (error) throw error;
 
+    // ثبت پیشنهاد برای کاربر
+    await supabase.from('transfer_bids').insert({
+      listing_id: (await supabase.from('transfer_listings').select('id').eq('player_id', selectedPlayerToBuy.id).single()).data.id,
+      bidder_team_id: currentTeam.id,
+      bidder_user_id: currentUser.id,
+      amount: amount,
+      status: 'pending'
+    });
+
     els.bidModal.hidden = true;
     alert('✅ پیشنهاد ثبت شد!');
     location.reload();
@@ -189,6 +214,42 @@ els.placeBid?.addEventListener('click', async () => {
     els.placeBid.textContent = '⚔️ ثبت پیشنهاد';
   }
 });
+
+// ====================================================
+// پیشنهادهای من
+// ====================================================
+async function loadMyBids() {
+  const { data } = await supabase
+    .from('transfer_bids')
+    .select(`*, listing:listing_id(*, player:player_id(name, position, overall))`)
+    .eq('bidder_user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  myBids = data || [];
+  renderMyBids();
+}
+
+function renderMyBids() {
+  if (myBids.length === 0) {
+    els.myBidsList.innerHTML = `<div class="empty-market"><h3>پیشنهادی ندارید</h3></div>`;
+    return;
+  }
+
+  els.myBidsList.innerHTML = myBids.map(bid => {
+    const l = bid.listing;
+    const p = l?.player;
+    if (!p) return '';
+    return `
+      <div class="market-player">
+        <div class="player-avatar-small">${p.name.charAt(0)}</div>
+        <div class="player-main-info">
+          <div class="player-main-name">${p.name}</div>
+          <div class="player-main-team">پیشنهاد شما: ${formatMoney(bid.amount)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
 els.closeBidModal?.addEventListener('click', () => els.bidModal.hidden = true);
 els.cancelBid?.addEventListener('click', () => els.bidModal.hidden = true);
