@@ -1,3 +1,6 @@
+// squad.js
+// منطق کامل صفحه بازیکنان + فروش
+
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { getTeamPlayers, getOverallTier, getPositionColor, formatMoney } from './players.js';
@@ -11,6 +14,8 @@ const els = {
   topPlayer: document.getElementById('topPlayer'),
   playersGrid: document.getElementById('playersGrid'),
   loadingOverlay: document.getElementById('loadingOverlay'),
+  
+  // Player Modal
   playerModal: document.getElementById('playerModal'),
   playerModalClose: document.getElementById('playerModalClose'),
   playerModalPhoto: document.getElementById('playerModalPhoto'),
@@ -28,8 +33,11 @@ let allPlayers = [];
 let filteredPlayers = [];
 let currentFilter = 'all';
 let selectedPlayer = null;
-let listedPlayerIds = new Set(); // بازیکنان در حال فروش
+let listedPlayerIds = new Set(); // بازیکنانی که در بازارن
 
+// ====================================================
+// شروع
+// ====================================================
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   
@@ -55,6 +63,7 @@ async function init() {
   renderSummary();
   els.loadingOverlay.hidden = true;
 
+  // فیلترها
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -68,12 +77,18 @@ async function init() {
   els.sellBtn?.addEventListener('click', handleSellPlayer);
 }
 
+// ====================================================
+// اطلاعات کاربر
+// ====================================================
 function renderUserInfo() {
   const profile = currentUser?.profile || currentUser || {};
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(profile.coins || 0);
   if (els.gemsDisplay) els.gemsDisplay.textContent = formatNumber(profile.gems || 0);
 }
 
+// ====================================================
+// بازیکنان
+// ====================================================
 async function loadPlayers() {
   allPlayers = await getTeamPlayers(currentTeam.id);
 }
@@ -115,6 +130,9 @@ function applyFilter() {
   renderPlayers();
 }
 
+// ====================================================
+// نمایش کارت‌های بازیکنان
+// ====================================================
 function renderPlayers() {
   filteredPlayers = [...allPlayers].sort((a,b) => b.overall - a.overall);
 
@@ -148,6 +166,9 @@ function renderPlayers() {
   });
 }
 
+// ====================================================
+// مودال بازیکن
+// ====================================================
 function openPlayerModal(id) {
   const player = allPlayers.find(p => p.id === id);
   if (!player) return;
@@ -191,47 +212,92 @@ function openPlayerModal(id) {
   els.playerModal.hidden = false;
 }
 
+// ====================================================
+// فروش بازیکن (با اسلایدر قیمت)
+// ====================================================
 async function handleSellPlayer() {
   if (!selectedPlayer) return;
   
   const price = Math.pow(selectedPlayer.overall, 2) * 1000;
-  const input = prompt(`قیمت پایه برای فروش ${selectedPlayer.name}:\n(پیشنهاد: ${Math.floor(price).toLocaleString()})`, Math.floor(price));
-
-  if (!input) return;
-  const basePrice = parseInt(input.replace(/,/g, ''));
-  if (isNaN(basePrice) || basePrice < 1000) return alert('قیمت نامعتبر است');
-
-  try {
-    els.sellBtn.disabled = true;
-    els.sellBtn.textContent = '⏳ صبر کنید...';
-    
-    const endsAt = new Date();
-    endsAt.setHours(endsAt.getHours() + 10); // ۱۰ ساعت
-
-    const { error } = await supabase.from('transfer_listings').insert({
-      player_id: selectedPlayer.id,
-      seller_team_id: currentTeam.id,
-      seller_user_id: currentUser.id,
-      base_price: basePrice,
-      current_highest_bid: basePrice,
-      status: 'active',
-      ends_at: endsAt.toISOString()
-    });
-
-    if (error) throw error;
-
-    // آپدیت دیتای محلی
-    listedPlayerIds.add(selectedPlayer.id);
-    renderPlayers();
-    els.playerModal.hidden = true;
-    alert('✅ بازیکن به بازار فروش اضافه شد!');
-
-  } catch (error) {
-    console.error(error);
-    alert('خطا: ' + error.message);
+  
+  // باز کردن مودال قیمت (با اسلایدر)
+  const modal = document.getElementById('sellModal');
+  if (!modal) {
+    alert('مودال فروش پیدا نشد! (فایل HTML رو آپدیت کن)');
+    return;
   }
+  
+  document.getElementById('sellPlayerName').textContent = selectedPlayer.name;
+  document.getElementById('sellPlayerMeta').textContent = `${selectedPlayer.position} • ${selectedPlayer.overall} OVR`;
+  document.getElementById('sellAvatar').textContent = selectedPlayer.name.charAt(0);
+  
+  const slider = document.getElementById('sellAmountSlider');
+  const display = document.getElementById('sellAmountDisplay');
+  
+  slider.min = Math.floor(price * 0.8); // ۸۰٪ ارزش
+  slider.max = Math.floor(price * 2);   // ۲۰۰٪ ارزش
+  slider.value = price;                 // شروع روی ۱۰۰٪
+  slider.step = Math.floor(price * 0.05);
+  
+  display.textContent = formatNumber(price);
+  
+  // رویداد اسلایدر
+  slider.oninput = (e) => {
+    display.textContent = formatNumber(parseInt(e.target.value));
+  };
+  
+  modal.hidden = false;
+  
+  // دکمه تایید
+  document.getElementById('confirmSellBtn').onclick = async () => {
+    const basePrice = parseInt(slider.value);
+    const btn = document.getElementById('confirmSellBtn');
+    
+    btn.disabled = true;
+    btn.textContent = '⏳ انتشار...';
+    
+    try {
+      const endsAt = new Date();
+      endsAt.setHours(endsAt.getHours() + 10); // ۱۰ ساعت
+      
+      const { error } = await supabase.from('transfer_listings').insert({
+        player_id: selectedPlayer.id,
+        seller_team_id: currentTeam.id,
+        seller_user_id: currentUser.id,
+        base_price: basePrice,
+        current_highest_bid: basePrice,
+        status: 'active',
+        ends_at: endsAt.toISOString()
+      });
+      
+      if (error) throw error;
+      
+      // آپدیت دیتای محلی
+      listedPlayerIds.add(selectedPlayer.id);
+      renderPlayers();
+      modal.hidden = true;
+      els.playerModal.hidden = true;
+      
+      alert('✅ بازیکن در بازار فروش قرار گرفت!');
+      
+    } catch (error) {
+      console.error(error);
+      alert('خطا: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📢 انتشار در بازار';
+    }
+  };
+  
+  // دکمه انصراف
+  document.getElementById('cancelSellBtn').onclick = () => {
+    modal.hidden = true;
+  };
 }
 
+// ====================================================
+// توابع کمکی
+// ====================================================
 function getEmoji(pos) {
   if (pos === 'GK') return '🧤';
   if (['CB', 'LB', 'RB'].includes(pos)) return '🛡️';
@@ -245,4 +311,5 @@ function formatNumber(num) {
   return num;
 }
 
+// شروع
 init();
