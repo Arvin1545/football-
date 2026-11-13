@@ -16,7 +16,7 @@
     <a href="game.html" class="menu-btn back-btn-header"><span>→</span></a>
     <div class="header-title">
       <span class="header-icon">💰</span>
-      <span class="header-name">بازار نقل و انتقالات</span>
+      <span class="header-name">نقل و انتقالات</span>
     </div>
     <div class="header-actions">
       <div class="resource-pill">
@@ -26,27 +26,51 @@
     </div>
   </header>
 
-  <!-- فیلتر پست‌ها به صورت اسکرول افقی -->
-  <section class="position-tabs" id="positionTabs">
-    <button class="pos-btn active" data-pos="all">همه</button>
-    <button class="pos-btn" data-pos="GK">GK</button>
-    <button class="pos-btn" data-pos="CB">CB</button>
-    <button class="pos-btn" data-pos="LB">LB</button>
-    <button class="pos-btn" data-pos="RB">RB</button>
-    <button class="pos-btn" data-pos="CDM">CDM</button>
-    <button class="pos-btn" data-pos="CM">CM</button>
-    <button class="pos-btn" data-pos="CAM">CAM</button>
-    <button class="pos-btn" data-pos="LW">LW</button>
-    <button class="pos-btn" data-pos="RW">RW</button>
-    <button class="pos-btn" data-pos="ST">ST</button>
+  <!-- تب‌ها -->
+  <section class="transfers-tabs">
+    <button class="tab-btn active" data-tab="market">
+      <span>🛒</span>
+      <span>بازار</span>
+    </button>
+    <button class="tab-btn" data-tab="my-bids">
+      <span>⚔️</span>
+      <span>پیشنهادهای من</span>
+    </button>
   </section>
 
-  <!-- لیست بازیکنان بازار -->
-  <main class="players-market" id="marketList">
-    <div class="loading-state">
-      <div class="loader-ball">⚽</div>
-      <p>در حال بارگذاری...</p>
-    </div>
+  <!-- تب بازار -->
+  <main class="tab-content active" id="marketTab">
+    <!-- فیلتر پست‌ها -->
+    <section class="position-tabs" id="positionTabs">
+      <button class="pos-btn active" data-pos="all">همه</button>
+      <button class="pos-btn" data-pos="GK">GK</button>
+      <button class="pos-btn" data-pos="CB">CB</button>
+      <button class="pos-btn" data-pos="LB">LB</button>
+      <button class="pos-btn" data-pos="RB">RB</button>
+      <button class="pos-btn" data-pos="CDM">CDM</button>
+      <button class="pos-btn" data-pos="CM">CM</button>
+      <button class="pos-btn" data-pos="CAM">CAM</button>
+      <button class="pos-btn" data-pos="LW">LW</button>
+      <button class="pos-btn" data-pos="RW">RW</button>
+      <button class="pos-btn" data-pos="ST">ST</button>
+    </section>
+
+    <section class="players-market" id="marketList">
+      <div class="loading-state">
+        <div class="loader-ball">⚽</div>
+        <p>در حال بارگذاری بازار...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- تب پیشنهادهای من -->
+  <main class="tab-content" id="myBidsTab">
+    <section class="my-bids" id="myBidsList">
+      <div class="loading-state">
+        <div class="loader-ball">⚽</div>
+        <p>در حال بارگذاری...</p>
+      </div>
+    </section>
   </main>
 
   <!-- مودال پیشنهاد -->
