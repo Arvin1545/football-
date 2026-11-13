@@ -16,7 +16,7 @@
     <a href="game.html" class="menu-btn back-btn-header"><span>→</span></a>
     <div class="header-title">
       <span class="header-icon">💰</span>
-      <span class="header-name">نقل و انتقالات</span>
+      <span class="header-name">بازار نقل و انتقالات</span>
     </div>
     <div class="header-actions">
       <div class="resource-pill">
@@ -26,37 +26,30 @@
     </div>
   </header>
 
-  <!-- فقط تب بازار -->
-  <main class="tab-content active" style="display:block;">
-    <section class="transfers-filters">
-      <input type="text" id="searchInput" placeholder="🔍 جستجوی بازیکن..." class="search-input">
-      <div class="filter-row">
-        <select id="positionFilter" class="filter-select">
-          <option value="all">همه پست‌ها</option>
-          <option value="GK">GK</option>
-          <option value="CB">CB</option>
-          <option value="LB">LB</option>
-          <option value="RB">RB</option>
-          <option value="CDM">CDM</option>
-          <option value="CM">CM</option>
-          <option value="CAM">CAM</option>
-          <option value="LW">LW</option>
-          <option value="RW">RW</option>
-          <option value="ST">ST</option>
-        </select>
-      </div>
-    </section>
+  <!-- فیلتر پست‌ها به صورت اسکرول افقی -->
+  <section class="position-tabs" id="positionTabs">
+    <button class="pos-btn active" data-pos="all">همه</button>
+    <button class="pos-btn" data-pos="GK">GK</button>
+    <button class="pos-btn" data-pos="CB">CB</button>
+    <button class="pos-btn" data-pos="LB">LB</button>
+    <button class="pos-btn" data-pos="RB">RB</button>
+    <button class="pos-btn" data-pos="CDM">CDM</button>
+    <button class="pos-btn" data-pos="CM">CM</button>
+    <button class="pos-btn" data-pos="CAM">CAM</button>
+    <button class="pos-btn" data-pos="LW">LW</button>
+    <button class="pos-btn" data-pos="RW">RW</button>
+    <button class="pos-btn" data-pos="ST">ST</button>
+  </section>
 
-    <!-- لیست بازیکنان بازار -->
-    <section class="players-market" id="marketList">
-      <div class="loading-state">
-        <div class="loader-ball">⚽</div>
-        <p>در حال بارگذاری بازار...</p>
-      </div>
-    </section>
+  <!-- لیست بازیکنان بازار -->
+  <main class="players-market" id="marketList">
+    <div class="loading-state">
+      <div class="loader-ball">⚽</div>
+      <p>در حال بارگذاری...</p>
+    </div>
   </main>
 
-  <!-- مودال پیشنهاد خرید -->
+  <!-- مودال پیشنهاد -->
   <div id="bidModal" class="listing-modal" hidden>
     <div class="listing-modal-content">
       <button class="close-modal-btn" id="closeBidModal">✕</button>
@@ -75,29 +68,29 @@
           </div>
         </div>
         <div class="price-section">
-          <label class="price-label">💵 پیشنهاد شما</label>
+          <label class="price-label">💵 پیشنهاد شما (بالاتر از قیمت پایه)</label>
           <div class="price-display">
             <span id="bidAmountDisplay">0</span>
             <span class="currency">€</span>
           </div>
           <input type="range" id="bidAmountSlider" min="0" max="100000000" step="1000000" value="10000000" class="price-slider">
           <div class="price-range-labels">
-            <span>قیمت پایه</span>
-            <span>بالاتر</span>
+            <span>متوسط</span>
+            <span>بالا</span>
             <span>خیلی بالا</span>
           </div>
         </div>
       </div>
       <div class="listing-actions">
         <button class="btn-cancel" id="cancelBid">انصراف</button>
-        <button class="btn-publish" id="placeBid">⚔️ ارسال پیشنهاد</button>
+        <button class="btn-publish" id="placeBid">⚔️ ثبت پیشنهاد</button>
       </div>
     </div>
   </div>
 
   <div id="loadingOverlay" class="loading-overlay" hidden>
     <div class="loader-ball">⚽</div>
-    <p id="loadingText">در حال بارگذاری...</p>
+    <p>در حال بارگذاری...</p>
   </div>
 
   <script type="module" src="js/transfers.js"></script>
