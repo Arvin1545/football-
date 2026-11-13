@@ -23,7 +23,6 @@ const els = {
   playerInfoGrid: document.getElementById('playerInfoGrid'),
   sellBtn: document.getElementById('sellBtn'),
   
-  // مودال فروش
   sellModal: document.getElementById('sellModal'),
   closeSellModal: document.getElementById('closeSellModal'),
   sellAvatar: document.getElementById('sellAvatar'),
@@ -42,6 +41,13 @@ let filteredPlayers = [];
 let currentFilter = 'all';
 let selectedPlayer = null;
 let listedPlayerIds = new Set();
+
+// ====================================================
+// فرمول جدید قیمت (برای اورال ۹۰ = ۲۰ میلیون)
+// ====================================================
+function calculatePlayerValue(overall) {
+  return overall * 222222;
+}
 
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -68,7 +74,6 @@ async function init() {
   renderSummary();
   els.loadingOverlay.hidden = true;
 
-  // فیلترها
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -78,20 +83,16 @@ async function init() {
     });
   });
 
-  // بستن مودال‌ها
   els.playerModalClose?.addEventListener('click', () => els.playerModal.hidden = true);
   els.closeSellModal?.addEventListener('click', () => els.sellModal.hidden = true);
   els.cancelSellBtn?.addEventListener('click', () => els.sellModal.hidden = true);
   
-  // دکمه فروش
   els.sellBtn?.addEventListener('click', openSellModal);
   
-  // اسلایدر
   els.sellAmountSlider?.addEventListener('input', (e) => {
     els.sellAmountDisplay.textContent = formatNumber(parseInt(e.target.value));
   });
   
-  // دکمه تایید فروش
   els.confirmSellBtn?.addEventListener('click', confirmSell);
 }
 
@@ -120,7 +121,7 @@ async function checkListedPlayers() {
 function renderSummary() {
   const total = allPlayers.length;
   const avg = total > 0 ? Math.round(allPlayers.reduce((s, p) => s + p.overall, 0) / total) : 0;
-  const value = allPlayers.reduce((s, p) => s + Math.pow(p.overall, 2) * 1000, 0);
+  const value = allPlayers.reduce((s, p) => s + calculatePlayerValue(p.overall), 0);
   const top = total > 0 ? allPlayers.reduce((b, p) => p.overall > b.overall ? p : b, allPlayers[0]) : null;
 
   if (els.totalPlayers) els.totalPlayers.textContent = total;
@@ -201,7 +202,7 @@ function openPlayerModal(id) {
   els.playerInfoGrid.innerHTML = `
     <div class="info-item"><span>شماره</span><strong>#${player.shirt_number}</strong></div>
     <div class="info-item"><span>سن</span><strong>${player.age} سال</strong></div>
-    <div class="info-item"><span>ارزش</span><strong>${formatMoney(Math.pow(player.overall, 2) * 1000)}</strong></div>
+    <div class="info-item"><span>ارزش</span><strong>${formatMoney(calculatePlayerValue(player.overall))}</strong></div>
   `;
 
   if (isListed) {
@@ -217,13 +218,10 @@ function openPlayerModal(id) {
   els.playerModal.hidden = false;
 }
 
-// ====================================================
-// مودال فروش
-// ====================================================
 function openSellModal() {
   if (!selectedPlayer) return;
   
-  const price = Math.pow(selectedPlayer.overall, 2) * 1000;
+  const price = calculatePlayerValue(selectedPlayer.overall);
   
   els.sellAvatar.textContent = selectedPlayer.name.charAt(0);
   els.sellPlayerName.textContent = selectedPlayer.name;
