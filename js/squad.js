@@ -42,9 +42,6 @@ let currentFilter = 'all';
 let selectedPlayer = null;
 let listedPlayerIds = new Set();
 
-// ====================================================
-// فرمول جدید قیمت (برای اورال ۹۰ = ۲۰ میلیون)
-// ====================================================
 function calculatePlayerValue(overall) {
   return overall * 222222;
 }
