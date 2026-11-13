@@ -5,27 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>نقل و انتقالات | امپراتور فوتبال</title>
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/game.css">
   <link rel="stylesheet" href="css/transfers.css">
 </head>
 <body class="game-page transfers-page">
 
-  <!-- هدر -->
   <header class="game-header">
-    <a href="game.html" class="menu-btn back-btn-header">
-      <span>→</span>
-    </a>
-
+    <a href="game.html" class="menu-btn back-btn-header"><span>→</span></a>
     <div class="header-title">
       <span class="header-icon">💰</span>
       <span class="header-name">نقل و انتقالات</span>
     </div>
-
     <div class="header-actions">
       <div class="resource-pill">
         <span>🪙</span>
@@ -34,28 +26,10 @@
     </div>
   </header>
 
-  <!-- تب‌ها -->
-  <section class="transfers-tabs">
-    <button class="tab-btn active" data-tab="market">
-      <span>🛒</span>
-      <span>بازار</span>
-    </button>
-    <button class="tab-btn" data-tab="my-listings">
-      <span>📋</span>
-      <span>بازیکنان من</span>
-    </button>
-    <button class="tab-btn" data-tab="my-bids">
-      <span>⚔️</span>
-      <span>پیشنهادهای من</span>
-    </button>
-  </section>
-
-  <!-- تب بازار -->
-  <main class="tab-content active" id="marketTab">
-    <!-- فیلترها -->
+  <!-- فقط تب بازار -->
+  <main class="tab-content active" style="display:block;">
     <section class="transfers-filters">
       <input type="text" id="searchInput" placeholder="🔍 جستجوی بازیکن..." class="search-input">
-      
       <div class="filter-row">
         <select id="positionFilter" class="filter-select">
           <option value="all">همه پست‌ها</option>
@@ -70,17 +44,6 @@
           <option value="RW">RW</option>
           <option value="ST">ST</option>
         </select>
-        
-        <select id="teamFilter" class="filter-select">
-          <option value="all">همه تیم‌ها</option>
-        </select>
-        
-        <select id="sortFilter" class="filter-select">
-          <option value="overall-desc">بالاترین اورال</option>
-          <option value="overall-asc">پایین‌ترین اورال</option>
-          <option value="price-asc">ارزان‌ترین</option>
-          <option value="price-desc">گران‌ترین</option>
-        </select>
       </div>
     </section>
 
@@ -93,79 +56,10 @@
     </section>
   </main>
 
-  <!-- تب بازیکنان من -->
-  <main class="tab-content" id="myListingsTab">
-    <section class="my-players" id="myPlayersList">
-      <div class="loading-state">
-        <div class="loader-ball">⚽</div>
-        <p>در حال بارگذاری...</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- تب پیشنهادهای من -->
-  <main class="tab-content" id="myBidsTab">
-    <section class="my-bids" id="myBidsList">
-      <div class="loading-state">
-        <div class="loader-ball">⚽</div>
-        <p>در حال بارگذاری...</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- مودال مزایده -->
-  <div id="listingModal" class="listing-modal" hidden>
-    <div class="listing-modal-content">
-      <button class="close-modal-btn" id="closeListingModal">✕</button>
-      
-      <div class="listing-header">
-        <div class="listing-avatar" id="listingAvatar">👤</div>
-        <div class="listing-info">
-          <h2 id="listingPlayerName">-</h2>
-          <div class="listing-meta" id="listingMeta">-</div>
-        </div>
-      </div>
-
-      <div class="listing-body">
-        <!-- قیمت پایه -->
-        <div class="price-section">
-          <label class="price-label">💰 قیمت پایه پیشنهادی</label>
-          
-          <div class="price-display">
-            <span id="basePriceDisplay">0</span>
-            <span class="currency">€</span>
-          </div>
-          
-          <input type="range" id="basePriceSlider" min="0" max="100000000" step="1000000" value="10000000" class="price-slider">
-          
-          <div class="price-range-labels">
-            <span>کم</span>
-            <span>متوسط</span>
-            <span>زیاد</span>
-          </div>
-        </div>
-
-        <!-- زمان -->
-        <div class="time-section">
-          <div class="time-info">
-            <span>⏰ مدت مزایده:</span>
-            <strong>۱۰ ساعت</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="listing-actions">
-        <button class="btn-cancel" id="cancelListing">انصراف</button>
-        <button class="btn-publish" id="publishListing">📢 انتشار در بازار</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- مودال پیشنهاد -->
+  <!-- مودال پیشنهاد خرید -->
   <div id="bidModal" class="listing-modal" hidden>
     <div class="listing-modal-content">
       <button class="close-modal-btn" id="closeBidModal">✕</button>
-      
       <div class="listing-header">
         <div class="listing-avatar" id="bidAvatar">👤</div>
         <div class="listing-info">
@@ -173,35 +67,20 @@
           <div class="listing-meta" id="bidMeta">-</div>
         </div>
       </div>
-
       <div class="listing-body">
-        <!-- اطلاعات مزایده -->
         <div class="bid-info-box">
           <div class="bid-info-row">
             <span>💰 قیمت پایه:</span>
             <strong id="bidBasePrice">0</strong>
           </div>
-          <div class="bid-info-row">
-            <span>📈 بالاترین پیشنهاد:</span>
-            <strong id="bidHighest">0</strong>
-          </div>
-          <div class="bid-info-row">
-            <span>⏰ زمان باقیمانده:</span>
-            <strong id="bidTimeLeft">-</strong>
-          </div>
         </div>
-
-        <!-- پیشنهاد -->
         <div class="price-section">
           <label class="price-label">💵 پیشنهاد شما</label>
-          
           <div class="price-display">
             <span id="bidAmountDisplay">0</span>
             <span class="currency">€</span>
           </div>
-          
           <input type="range" id="bidAmountSlider" min="0" max="100000000" step="1000000" value="10000000" class="price-slider">
-          
           <div class="price-range-labels">
             <span>قیمت پایه</span>
             <span>بالاتر</span>
@@ -209,7 +88,6 @@
           </div>
         </div>
       </div>
-
       <div class="listing-actions">
         <button class="btn-cancel" id="cancelBid">انصراف</button>
         <button class="btn-publish" id="placeBid">⚔️ ارسال پیشنهاد</button>
@@ -217,7 +95,6 @@
     </div>
   </div>
 
-  <!-- لودینگ -->
   <div id="loadingOverlay" class="loading-overlay" hidden>
     <div class="loader-ball">⚽</div>
     <p id="loadingText">در حال بارگذاری...</p>
