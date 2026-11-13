@@ -744,3 +744,34 @@
     height: 100px;
   }
 }
+/* استایل کارت بازیکنی که در بازاره */
+.player-card.listed-card {
+  border-color: #10b981 !important;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff) !important;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2) !important;
+  position: relative;
+}
+
+.player-card.listed-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 185, 129, 0.05);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.listed-badge {
+  background: #10b981;
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 4px;
+  text-align: center;
+  border-radius: 0 0 14px 14px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+}
