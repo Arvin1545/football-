@@ -1,21 +1,7 @@
-// squad.js
-// منطق صفحه بازیکنان
-
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
-import { 
-  getTeamPlayers, 
-  getOverallTier, 
-  getPositionColor, 
-  getPositionName,
-  formatMoney,
-  isStarPlayer
-} from './players.js';
-import { renderPlayerCard } from './player-cards.js';
+import { getTeamPlayers, getOverallTier, getPositionColor, formatMoney } from './players.js';
 
-// ====================================================
-// المان‌ها
-// ====================================================
 const els = {
   coinsDisplay: document.getElementById('coinsDisplay'),
   gemsDisplay: document.getElementById('gemsDisplay'),
@@ -24,345 +10,239 @@ const els = {
   totalValue: document.getElementById('totalValue'),
   topPlayer: document.getElementById('topPlayer'),
   playersGrid: document.getElementById('playersGrid'),
-  sortSelect: document.getElementById('sortSelect'),
   loadingOverlay: document.getElementById('loadingOverlay'),
-  
-  // Modal
   playerModal: document.getElementById('playerModal'),
   playerModalClose: document.getElementById('playerModalClose'),
-  playerModalHeader: document.getElementById('playerModalHeader'),
   playerModalPhoto: document.getElementById('playerModalPhoto'),
   playerModalName: document.getElementById('playerModalName'),
   playerModalPosition: document.getElementById('playerModalPosition'),
   playerModalOverall: document.getElementById('playerModalOverall'),
   playerStatsGrid: document.getElementById('playerStatsGrid'),
   playerInfoGrid: document.getElementById('playerInfoGrid'),
-  playerTotalGrid: document.getElementById('playerTotalGrid'),
-  actionBtn: document.getElementById('actionBtn'),
   sellBtn: document.getElementById('sellBtn')
 };
 
-// ====================================================
-// متغیرها
-// ====================================================
 let currentUser = null;
 let currentTeam = null;
 let allPlayers = [];
 let filteredPlayers = [];
 let currentFilter = 'all';
-let currentSort = 'overall-desc';
 let selectedPlayer = null;
+let listedPlayerIds = new Set(); // بازیکنان در حال فروش
 
-// ====================================================
-// شروع
-// ====================================================
 async function init() {
-  console.log('👥 شروع squad.js');
+  const { data: { session } } = await supabase.auth.getSession();
   
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session) {
-      currentUser = session.user;
-      await loadUserData(session.user);
-    } else {
-      const guest = await getCurrentGuestProfile();
-      if (guest) {
-        currentUser = guest;
-        window.location.href = 'game.html';
-        return;
-      } else {
-        window.location.href = 'index.html';
-        return;
-      }
-    }
-    
-    if (!currentTeam) {
-      window.location.href = 'league-select.html';
-      return;
-    }
-    
-    renderUserInfo();
-    await loadPlayers();
-    renderSummary();
-    
-    if (els.loadingOverlay) els.loadingOverlay.hidden = true;
-    
-  } catch (error) {
-    console.error('❌ خطا:', error);
-    if (els.loadingOverlay) els.loadingOverlay.hidden = true;
+  if (session) {
+    currentUser = session.user;
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (profile) currentUser.profile = profile;
+    const { data: team } = await supabase.from('teams').select('*').eq('taken_by', currentUser.id).maybeSingle();
+    currentTeam = team;
+  } else {
+    const guest = await getCurrentGuestProfile();
+    if (guest) currentUser = guest;
+    else { window.location.href = 'index.html'; return; }
   }
+
+  if (!currentTeam) { window.location.href = 'league-select.html'; return; }
+
+  renderUserInfo();
+  await loadPlayers();
+  await checkListedPlayers(); // چک میکنه کدوم بازیکنا تو بازارن
+
+  renderPlayers();
+  renderSummary();
+  els.loadingOverlay.hidden = true;
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      applyFilter();
+    });
+  });
+
+  els.playerModalClose?.addEventListener('click', () => els.playerModal.hidden = true);
+  els.sellBtn?.addEventListener('click', handleSellPlayer);
 }
 
-// ====================================================
-// بارگذاری اطلاعات کاربر
-// ====================================================
-async function loadUserData(user) {
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  
-  currentUser.profile = profile;
-  
-  const { data: team } = await supabase
-    .from('teams')
-    .select('*')
-    .eq('taken_by', user.id)
-    .maybeSingle();
-  
-  currentTeam = team;
-}
-
-// ====================================================
-// نمایش اطلاعات کاربر
-// ====================================================
 function renderUserInfo() {
   const profile = currentUser?.profile || currentUser || {};
-  
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(profile.coins || 0);
   if (els.gemsDisplay) els.gemsDisplay.textContent = formatNumber(profile.gems || 0);
 }
 
-// ====================================================
-// بارگذاری بازیکنان
-// ====================================================
 async function loadPlayers() {
-  console.log('👥 بارگذاری بازیکنان...');
-  
   allPlayers = await getTeamPlayers(currentTeam.id);
-  
-  console.log('✅', allPlayers.length, 'بازیکن پیدا شد');
-  
-  if (allPlayers.length === 0) {
-    els.playersGrid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">👥</div>
-        <h3>بازیکنی یافت نشد</h3>
-        <p>تیم شما بازیکنی ندارد</p>
-        <a href="game.html" class="empty-btn">بازگشت به بازی</a>
-      </div>
-    `;
-    return;
-  }
-  
-  applyFiltersAndSort();
 }
 
-// ====================================================
-// فیلتر و مرتب‌سازی
-// ====================================================
-function applyFiltersAndSort() {
-  let filtered = [...allPlayers];
-  
-  if (currentFilter === 'GK') {
-    filtered = filtered.filter(p => p.position === 'GK');
-  } else if (currentFilter === 'DEF') {
-    filtered = filtered.filter(p => ['CB', 'LB', 'RB'].includes(p.position));
-  } else if (currentFilter === 'MID') {
-    filtered = filtered.filter(p => ['CDM', 'CM', 'CAM'].includes(p.position));
-  } else if (currentFilter === 'ATT') {
-    filtered = filtered.filter(p => ['LW', 'RW', 'ST', 'CF'].includes(p.position));
-  } else if (currentFilter === 'starter') {
-    filtered = filtered.filter(p => p.is_starter);
-  } else if (currentFilter === 'bench') {
-    filtered = filtered.filter(p => !p.is_starter);
+async function checkListedPlayers() {
+  // گرفتن لیست بازیکنانی که در مزایده فعال هستن
+  const { data } = await supabase
+    .from('transfer_listings')
+    .select('player_id')
+    .eq('status', 'active')
+    .eq('seller_team_id', currentTeam.id);
+
+  if (data) {
+    listedPlayerIds = new Set(data.map(l => l.player_id));
   }
-  
-  const [field, order] = currentSort.split('-');
-  
-  filtered.sort((a, b) => {
-    let valA, valB;
-    
-    if (field === 'overall') {
-      valA = a.overall;
-      valB = b.overall;
-    } else if (field === 'age') {
-      valA = a.age;
-      valB = b.age;
-    } else if (field === 'position') {
-      const posOrder = { 'GK': 1, 'CB': 2, 'LB': 3, 'RB': 4, 'CDM': 5, 'CM': 6, 'CAM': 7, 'LW': 8, 'RW': 9, 'ST': 10, 'CF': 11 };
-      return (posOrder[a.position] || 99) - (posOrder[b.position] || 99);
-    } else if (field === 'value') {
-      valA = getPlayerValue(a);
-      valB = getPlayerValue(b);
-    }
-    
-    if (order === 'asc') return valA - valB;
-    return valB - valA;
-  });
-  
-  filteredPlayers = filtered;
-  renderPlayers();
 }
 
-// ====================================================
-// نمایش بازیکنان (با کارت گرافیکی)
-// ====================================================
-function renderPlayers() {
-  if (filteredPlayers.length === 0) {
-    els.playersGrid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <h3>بازیکنی یافت نشد</h3>
-        <p>با این فیلتر بازیکنی نیست</p>
-      </div>
-    `;
-    return;
-  }
-  
-  // استفاده از تابع renderPlayerCard
-  els.playersGrid.innerHTML = filteredPlayers.map(player => 
-    renderPlayerCard(player, currentTeam)
-  ).join('');
-  
-  // کلیک روی کارت‌ها
-  document.querySelectorAll('.player-card').forEach(card => {
-    card.addEventListener('click', () => openPlayerModal(card.dataset.id));
-  });
-}
-
-// ====================================================
-// آمار کلی
-// ====================================================
 function renderSummary() {
   const total = allPlayers.length;
-  const avg = total > 0 
-    ? Math.round(allPlayers.reduce((sum, p) => sum + p.overall, 0) / total) 
-    : 0;
-  const value = allPlayers.reduce((sum, p) => sum + getPlayerValue(p), 0);
-  const top = allPlayers.length > 0 
-    ? allPlayers.reduce((best, p) => p.overall > best.overall ? p : best, allPlayers[0])
-    : null;
-  
+  const avg = total > 0 ? Math.round(allPlayers.reduce((s, p) => s + p.overall, 0) / total) : 0;
+  const value = allPlayers.reduce((s, p) => s + Math.pow(p.overall, 2) * 1000, 0);
+  const top = total > 0 ? allPlayers.reduce((b, p) => p.overall > b.overall ? p : b, allPlayers[0]) : null;
+
   if (els.totalPlayers) els.totalPlayers.textContent = total;
   if (els.avgOverall) els.avgOverall.textContent = avg;
   if (els.totalValue) els.totalValue.textContent = formatMoney(value);
   if (els.topPlayer) els.topPlayer.textContent = top ? top.name.split(' ')[0] : '-';
 }
 
-// ====================================================
-// مودال بازیکن
-// ====================================================
-function openPlayerModal(playerId) {
-  const player = allPlayers.find(p => p.id === playerId);
+function applyFilter() {
+  let list = [...allPlayers];
+  if (currentFilter === 'GK') list = list.filter(p => p.position === 'GK');
+  else if (currentFilter === 'DEF') list = list.filter(p => ['CB', 'LB', 'RB'].includes(p.position));
+  else if (currentFilter === 'MID') list = list.filter(p => ['CDM', 'CM', 'CAM'].includes(p.position));
+  else if (currentFilter === 'ATT') list = list.filter(p => ['LW', 'RW', 'ST'].includes(p.position));
+
+  list.sort((a, b) => b.overall - a.overall);
+  filteredPlayers = list;
+  renderPlayers();
+}
+
+function renderPlayers() {
+  filteredPlayers = [...allPlayers].sort((a,b) => b.overall - a.overall);
+
+  els.playersGrid.innerHTML = filteredPlayers.map(player => {
+    const tier = getOverallTier(player.overall);
+    const isListed = listedPlayerIds.has(player.id);
+    
+    return `
+      <div class="player-card ${isListed ? 'listed-card' : ''}" data-id="${player.id}">
+        <div class="player-card-top" style="background: ${tier.color}20;">
+          <div class="player-overall" style="color: ${tier.color};">${player.overall}</div>
+          <div class="player-position" style="background: ${getPositionColor(player.position)};">${player.position}</div>
+        </div>
+        
+        <div class="player-card-photo">
+          <div class="photo-placeholder">${getEmoji(player.position)}</div>
+        </div>
+        
+        <div class="player-card-info">
+          <div class="player-name">${player.name}</div>
+          <div class="player-meta">#${player.shirt_number} • ${player.age} ساله</div>
+        </div>
+        
+        ${isListed ? '<div class="listed-badge">💰 در بازار فروش</div>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.player-card').forEach(card => {
+    card.addEventListener('click', () => openPlayerModal(card.dataset.id));
+  });
+}
+
+function openPlayerModal(id) {
+  const player = allPlayers.find(p => p.id === id);
   if (!player) return;
   
   selectedPlayer = player;
   const tier = getOverallTier(player.overall);
-  const posColor = getPositionColor(player.position);
-  
+  const isListed = listedPlayerIds.has(player.id);
+
   els.playerModalName.textContent = player.name;
   els.playerModalPosition.textContent = player.position;
-  els.playerModalPosition.style.background = posColor;
+  els.playerModalPosition.style.background = getPositionColor(player.position);
   els.playerModalOverall.textContent = player.overall + ' OVR';
   els.playerModalOverall.style.color = tier.color;
-  
-  // آرم تیم (به جای عکس)
-  const emblem = getTeamEmblem(currentTeam.name);
-  els.playerModalPhoto.innerHTML = `<span style="font-size: 60px;">${emblem}</span>`;
-  
-  // مهارت‌ها
+  els.playerModalPhoto.innerHTML = getEmoji(player.position);
+
   els.playerStatsGrid.innerHTML = `
-    <div class="stat-item"><span>Pace</span><strong>${player.pace || 70}</strong></div>
-    <div class="stat-item"><span>Shooting</span><strong>${player.shooting || 70}</strong></div>
-    <div class="stat-item"><span>Passing</span><strong>${player.passing || 70}</strong></div>
-    <div class="stat-item"><span>Dribbling</span><strong>${player.dribbling || 70}</strong></div>
-    <div class="stat-item"><span>Defending</span><strong>${player.defending || 70}</strong></div>
-    <div class="stat-item"><span>Physical</span><strong>${player.physical || 70}</strong></div>
+    <div class="stat-item"><span>Pace</span><strong>${player.pace}</strong></div>
+    <div class="stat-item"><span>Shooting</span><strong>${player.shooting}</strong></div>
+    <div class="stat-item"><span>Passing</span><strong>${player.passing}</strong></div>
+    <div class="stat-item"><span>Dribbling</span><strong>${player.dribbling}</strong></div>
+    <div class="stat-item"><span>Defending</span><strong>${player.defending}</strong></div>
+    <div class="stat-item"><span>Physical</span><strong>${player.physical}</strong></div>
   `;
-  
-  const value = getPlayerValue(player);
+
   els.playerInfoGrid.innerHTML = `
-    <div class="info-item"><span>شماره</span><strong>${player.shirt_number || '-'}</strong></div>
+    <div class="info-item"><span>شماره</span><strong>#${player.shirt_number}</strong></div>
     <div class="info-item"><span>سن</span><strong>${player.age} سال</strong></div>
-    <div class="info-item"><span>ارزش</span><strong>${formatMoney(value)}</strong></div>
-    <div class="info-item"><span>وضعیت</span><strong>${player.is_starter ? 'ترکیب' : 'نیمکت'}</strong></div>
+    <div class="info-item"><span>ارزش</span><strong>${formatMoney(Math.pow(player.overall, 2) * 1000)}</strong></div>
   `;
-  
-  els.playerTotalGrid.innerHTML = `
-    <div class="total-item"><span>🎯 گل‌ها</span><strong>${player.total_goals || 0}</strong></div>
-    <div class="total-item"><span>🎁 پاس گل</span><strong>${player.total_assists || 0}</strong></div>
-    <div class="total-item"><span>⚽ بازی</span><strong>${player.total_matches || 0}</strong></div>
-  `;
-  
-  if (player.is_starter) {
-    els.actionBtn.textContent = '🪑 انتقال به نیمکت';
-    els.actionBtn.className = 'modal-btn secondary';
+
+  if (isListed) {
+    els.sellBtn.textContent = '⏰ در حال فروش';
+    els.sellBtn.disabled = true;
+    els.sellBtn.style.background = '#f59e0b';
   } else {
-    els.actionBtn.textContent = '✅ افزودن به ترکیب';
-    els.actionBtn.className = 'modal-btn primary';
+    els.sellBtn.textContent = '💰 فروش بازیکن';
+    els.sellBtn.disabled = false;
+    els.sellBtn.style.background = '#dc2626';
   }
-  
+
   els.playerModal.hidden = false;
 }
 
-// ====================================================
-// آرم تیم (از player-cards.js)
-// ====================================================
-function getTeamEmblem(teamName) {
-  // کپی ساده از player-cards
-  const emblems = {
-    'Arsenal': '🔴', 'Manchester City': '🔵', 'Liverpool': '🔴',
-    'Manchester United': '🔴', 'Chelsea': '🔵', 'Tottenham Hotspur': '⚪',
-    'Newcastle United': '⚫', 'Aston Villa': '🟣', 'Brighton': '🔵',
-    'Real Madrid': '⚪', 'Barcelona': '🔵', 'Atletico Madrid': '🔴',
-    'Bayern Munich': '🔴', 'Borussia Dortmund': '🟡', 'Paris Saint-Germain': '🔵'
-  };
-  return emblems[teamName] || '⚽';
+async function handleSellPlayer() {
+  if (!selectedPlayer) return;
+  
+  const price = Math.pow(selectedPlayer.overall, 2) * 1000;
+  const input = prompt(`قیمت پایه برای فروش ${selectedPlayer.name}:\n(پیشنهاد: ${Math.floor(price).toLocaleString()})`, Math.floor(price));
+
+  if (!input) return;
+  const basePrice = parseInt(input.replace(/,/g, ''));
+  if (isNaN(basePrice) || basePrice < 1000) return alert('قیمت نامعتبر است');
+
+  try {
+    els.sellBtn.disabled = true;
+    els.sellBtn.textContent = '⏳ صبر کنید...';
+    
+    const endsAt = new Date();
+    endsAt.setHours(endsAt.getHours() + 10); // ۱۰ ساعت
+
+    const { error } = await supabase.from('transfer_listings').insert({
+      player_id: selectedPlayer.id,
+      seller_team_id: currentTeam.id,
+      seller_user_id: currentUser.id,
+      base_price: basePrice,
+      current_highest_bid: basePrice,
+      status: 'active',
+      ends_at: endsAt.toISOString()
+    });
+
+    if (error) throw error;
+
+    // آپدیت دیتای محلی
+    listedPlayerIds.add(selectedPlayer.id);
+    renderPlayers();
+    els.playerModal.hidden = true;
+    alert('✅ بازیکن به بازار فروش اضافه شد!');
+
+  } catch (error) {
+    console.error(error);
+    alert('خطا: ' + error.message);
+  }
 }
 
-// ====================================================
-// بستن مودال
-// ====================================================
-function closePlayerModal() {
-  els.playerModal.hidden = true;
-  selectedPlayer = null;
-}
-
-els.playerModalClose?.addEventListener('click', closePlayerModal);
-els.playerModal?.addEventListener('click', (e) => {
-  if (e.target === els.playerModal) closePlayerModal();
-});
-
-// ====================================================
-// فیلتر
-// ====================================================
-document.querySelectorAll('.filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = btn.dataset.filter;
-    applyFiltersAndSort();
-  });
-});
-
-// ====================================================
-// ترتیب
-// ====================================================
-els.sortSelect?.addEventListener('change', (e) => {
-  currentSort = e.target.value;
-  applyFiltersAndSort();
-});
-
-// ====================================================
-// توابع کمکی
-// ====================================================
-function getPlayerValue(player) {
-  return Math.pow(player.overall, 2) * 1000;
+function getEmoji(pos) {
+  if (pos === 'GK') return '🧤';
+  if (['CB', 'LB', 'RB'].includes(pos)) return '🛡️';
+  if (['CDM', 'CM', 'CAM'].includes(pos)) return '⚙️';
+  return '⚽';
 }
 
 function formatNumber(num) {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
   if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return toPersianNumber(num);
+  return num;
 }
 
-function toPersianNumber(num) {
-  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-  return String(num).replace(/\d/g, d => persianDigits[d]);
-}
-
-// شروع
 init();
