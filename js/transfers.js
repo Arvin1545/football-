@@ -1,3 +1,4 @@
+// transfers.js
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { formatMoney, getPositionColor } from './players.js';
@@ -13,6 +14,7 @@ const els = {
   bidPlayerName: document.getElementById('bidPlayerName'),
   bidMeta: document.getElementById('bidMeta'),
   bidBasePrice: document.getElementById('bidBasePrice'),
+  bidHighestPrice: document.getElementById('bidHighestPrice'), // جدید
   bidAmountDisplay: document.getElementById('bidAmountDisplay'),
   bidAmountSlider: document.getElementById('bidAmountSlider'),
   cancelBid: document.getElementById('cancelBid'),
@@ -27,9 +29,6 @@ let selectedPlayerToBuy = null;
 let currentPosFilter = 'all';
 let myBids = [];
 
-// ====================================================
-// فرمول جدید قیمت (برای اورال ۹۰ = ۲۰ میلیون)
-// ====================================================
 function calculatePlayerValue(overall) {
   return overall * 222222;
 }
@@ -50,6 +49,10 @@ async function init() {
 
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(currentUser.profile?.coins || 1000);
 
+  // ۱. چک کردن مزایده‌های تموم شده (خودکار)
+  await checkExpiredListings();
+
+  // ۲. بارگذاری بازار
   await loadMarket();
   await loadMyBids();
   els.loadingOverlay.hidden = true;
@@ -74,6 +77,54 @@ async function init() {
   });
 }
 
+// ====================================================
+// چک کردن مزایده‌های منقضی شده (انتقال خودکار)
+// ====================================================
+async function checkExpiredListings() {
+  const now = new Date().toISOString();
+  
+  // گرفتن همه مزایده‌هایی که زمانشون تموم شده
+  const { data: expired } = await supabase
+    .from('transfer_listings')
+    .select('*')
+    .eq('status', 'active')
+    .lt('ends_at', now);
+  
+  if (!expired || expired.length === 0) return;
+  
+  for (const listing of expired) {
+    if (listing.current_highest_bidder_user_id && listing.current_highest_bid > listing.base_price) {
+      // ۱. انتقال بازیکن به برنده
+      await supabase.from('players').update({ team_id: listing.current_highest_bidder_team_id }).eq('id', listing.player_id);
+      
+      // ۲. کم کردن پول از برنده
+      const { data: buyer } = await supabase.from('profiles').select('coins').eq('id', listing.current_highest_bidder_user_id).single();
+      if (buyer) {
+        await supabase.from('profiles').update({ coins: Math.max(0, buyer.coins - listing.current_highest_bid) }).eq('id', listing.current_highest_bidder_user_id);
+      }
+      
+      // ۳. اضافه کردن پول به فروشنده
+      const { data: seller } = await supabase.from('profiles').select('coins').eq('id', listing.seller_user_id).single();
+      if (seller) {
+        await supabase.from('profiles').update({ coins: seller.coins + listing.current_highest_bid }).eq('id', listing.seller_user_id);
+      }
+      
+      // ۴. آپدیت وضعیت مزایده
+      await supabase.from('transfer_listings').update({ status: 'sold' }).eq('id', listing.id);
+      
+      // ۵. آپدیت پیشنهاد برنده
+      await supabase.from('transfer_bids').update({ status: 'accepted' }).eq('listing_id', listing.id).eq('bidder_user_id', listing.current_highest_bidder_user_id);
+      
+    } else {
+      // منقضی بدون فروش
+      await supabase.from('transfer_listings').update({ status: 'expired' }).eq('id', listing.id);
+    }
+  }
+}
+
+// ====================================================
+// بارگذاری بازار
+// ====================================================
 async function loadMarket() {
   if (!currentTeam) {
     els.marketList.innerHTML = `<div class="empty-market"><h3>تیم ندارید</h3></div>`;
@@ -91,8 +142,23 @@ async function loadMarket() {
     .limit(100);
 
   if (!players) return;
-  
-  allMarketPlayers = players;
+
+  // گرفتن مزایده‌های فعال برای این بازیکنان
+  const { data: listings } = await supabase
+    .from('transfer_listings')
+    .select('*')
+    .eq('status', 'active');
+
+  // چسبوندن بالاترین پیشنهاد به هر بازیکن
+  allMarketPlayers = players.map(p => {
+    const listing = listings?.find(l => l.player_id === p.id);
+    return {
+      ...p,
+      current_highest_bid: listing ? listing.current_highest_bid : 0,
+      listing_id: listing ? listing.id : null
+    };
+  });
+
   filterMarket();
 }
 
@@ -112,7 +178,9 @@ function renderMarket() {
   }
 
   els.marketList.innerHTML = filteredMarketPlayers.map(p => {
-    const price = calculatePlayerValue(p.overall);
+    const basePrice = calculatePlayerValue(p.overall);
+    const highest = p.current_highest_bid > 0 ? p.current_highest_bid : basePrice;
+    
     return `
       <div class="market-player">
         <div class="player-avatar-small">${p.name.charAt(0)}</div>
@@ -125,8 +193,8 @@ function renderMarket() {
           </div>
         </div>
         <div class="player-price-info">
-          <div class="player-price-value">${formatMoney(price)}</div>
-          <div class="player-price-label">قیمت</div>
+          <div class="player-price-value">${formatMoney(highest)}</div>
+          <div class="player-price-label">${p.current_highest_bid > 0 ? 'بالاترین پیشنهاد' : 'قیمت پایه'}</div>
         </div>
         <button class="player-action-btn" data-buy="${p.id}">💰 پیشنهاد</button>
       </div>
@@ -138,24 +206,33 @@ function renderMarket() {
   });
 }
 
+// ====================================================
+// مودال پیشنهاد
+// ====================================================
 function openBidModal(playerId) {
   const player = allMarketPlayers.find(p => p.id === playerId);
   if (!player) return;
 
   selectedPlayerToBuy = player;
-  const price = calculatePlayerValue(player.overall);
+  const basePrice = calculatePlayerValue(player.overall);
+  const currentHighest = player.current_highest_bid > 0 ? player.current_highest_bid : basePrice;
 
   els.bidAvatar.textContent = player.name.charAt(0);
   els.bidPlayerName.textContent = player.name;
   els.bidMeta.textContent = `${player.position} • ${player.overall} OVR`;
-  els.bidBasePrice.textContent = formatMoney(price);
+  els.bidBasePrice.textContent = formatMoney(basePrice);
+  
+  if (els.bidHighestPrice) {
+    els.bidHighestPrice.textContent = player.current_highest_bid > 0 ? formatMoney(player.current_highest_bid) : 'هنوز پیشنهادی نیست';
+  }
 
-  els.bidAmountSlider.min = price;
-  els.bidAmountSlider.max = Math.floor(price * 2);
-  els.bidAmountSlider.value = price;
-  els.bidAmountSlider.step = Math.floor(price * 0.05);
+  // اسلایدر باید بالاتر از بالاترین پیشنهاد فعلی باشه
+  els.bidAmountSlider.min = currentHighest + Math.floor(basePrice * 0.01);
+  els.bidAmountSlider.max = Math.floor(currentHighest * 1.5);
+  els.bidAmountSlider.value = currentHighest + Math.floor(basePrice * 0.05);
+  els.bidAmountSlider.step = Math.floor(basePrice * 0.01);
 
-  updateBidDisplay(price);
+  updateBidDisplay(els.bidAmountSlider.value);
   els.bidModal.hidden = false;
 }
 
@@ -167,6 +244,9 @@ els.bidAmountSlider?.addEventListener('input', (e) => {
   updateBidDisplay(parseInt(e.target.value));
 });
 
+// ====================================================
+// ثبت پیشنهاد
+// ====================================================
 els.placeBid?.addEventListener('click', async () => {
   if (!selectedPlayerToBuy) return;
   const amount = parseInt(els.bidAmountSlider.value);
@@ -175,37 +255,48 @@ els.placeBid?.addEventListener('click', async () => {
   els.placeBid.textContent = '⏳ ثبت...';
 
   try {
-    const endsAt = new Date();
-    endsAt.setHours(endsAt.getHours() + 10);
-
-    const { error } = await supabase.from('transfer_listings').insert({
-      player_id: selectedPlayerToBuy.id,
-      seller_team_id: selectedPlayerToBuy.team_id,
-      seller_user_id: null,
-      base_price: amount,
-      current_highest_bid: amount,
-      current_highest_bidder_team_id: currentTeam.id,
-      current_highest_bidder_user_id: currentUser.id,
-      status: 'active',
-      ends_at: endsAt.toISOString()
-    });
-
-    if (error) throw error;
-
-    const { data: newListing } = await supabase.from('transfer_listings').select('id').eq('player_id', selectedPlayerToBuy.id).single();
+    // ۱. اگه مزایده‌ای برای این بازیکن نیست، اول بساز
+    let listingId = selectedPlayerToBuy.listing_id;
     
-    if (newListing) {
-      await supabase.from('transfer_bids').insert({
-        listing_id: newListing.id,
-        bidder_team_id: currentTeam.id,
-        bidder_user_id: currentUser.id,
-        amount: amount,
-        status: 'pending'
-      });
+    if (!listingId) {
+      const endsAt = new Date();
+      endsAt.setHours(endsAt.getHours() + 10);
+
+      const { data: newListing, error } = await supabase.from('transfer_listings').insert({
+        player_id: selectedPlayerToBuy.id,
+        seller_team_id: selectedPlayerToBuy.team_id,
+        seller_user_id: null, // ربات
+        base_price: calculatePlayerValue(selectedPlayerToBuy.overall),
+        current_highest_bid: amount,
+        current_highest_bidder_team_id: currentTeam.id,
+        current_highest_bidder_user_id: currentUser.id,
+        status: 'active',
+        ends_at: endsAt.toISOString()
+      }).select().single();
+
+      if (error) throw error;
+      listingId = newListing.id;
+      
+    } else {
+      // اگه مزایده هست، فقط بالاترین رو آپدیت کن
+      await supabase.from('transfer_listings').update({
+        current_highest_bid: amount,
+        current_highest_bidder_team_id: currentTeam.id,
+        current_highest_bidder_user_id: currentUser.id
+      }).eq('id', listingId);
     }
 
+    // ۲. ثبت پیشنهاد
+    await supabase.from('transfer_bids').insert({
+      listing_id: listingId,
+      bidder_team_id: currentTeam.id,
+      bidder_user_id: currentUser.id,
+      amount: amount,
+      status: 'pending'
+    });
+
     els.bidModal.hidden = true;
-    alert('✅ پیشنهاد ثبت شد!');
+    alert('✅ پیشنهاد شما ثبت شد!');
     location.reload();
 
   } catch (error) {
@@ -217,6 +308,9 @@ els.placeBid?.addEventListener('click', async () => {
   }
 });
 
+// ====================================================
+// پیشنهادهای من
+// ====================================================
 async function loadMyBids() {
   if (!currentUser) return;
   const { data } = await supabase
@@ -247,6 +341,9 @@ function renderMyBids() {
         <div class="player-main-info">
           <div class="player-main-name">${p.name}</div>
           <div class="player-main-team">پیشنهاد شما: ${formatMoney(bid.amount)}</div>
+          <div class="player-main-badges">
+            <span class="badge-ovr">بالاترین: ${formatMoney(l.current_highest_bid)}</span>
+          </div>
         </div>
       </div>
     `;
