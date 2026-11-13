@@ -14,7 +14,7 @@ const els = {
   bidPlayerName: document.getElementById('bidPlayerName'),
   bidMeta: document.getElementById('bidMeta'),
   bidBasePrice: document.getElementById('bidBasePrice'),
-  bidHighestPrice: document.getElementById('bidHighestPrice'), // جدید
+  bidHighestPrice: document.getElementById('bidHighestPrice'),
   bidAmountDisplay: document.getElementById('bidAmountDisplay'),
   bidAmountSlider: document.getElementById('bidAmountSlider'),
   cancelBid: document.getElementById('cancelBid'),
@@ -83,7 +83,6 @@ async function init() {
 async function checkExpiredListings() {
   const now = new Date().toISOString();
   
-  // گرفتن همه مزایده‌هایی که زمانشون تموم شده
   const { data: expired } = await supabase
     .from('transfer_listings')
     .select('*')
@@ -143,7 +142,7 @@ async function loadMarket() {
 
   if (!players) return;
 
-  // گرفتن مزایده‌های فعال برای این بازیکنان
+  // گرفتن مزایده‌های فعال
   const { data: listings } = await supabase
     .from('transfer_listings')
     .select('*')
@@ -226,13 +225,16 @@ function openBidModal(playerId) {
     els.bidHighestPrice.textContent = player.current_highest_bid > 0 ? formatMoney(player.current_highest_bid) : 'هنوز پیشنهادی نیست';
   }
 
-  // اسلایدر باید بالاتر از بالاترین پیشنهاد فعلی باشه
-  els.bidAmountSlider.min = currentHighest + Math.floor(basePrice * 0.01);
-  els.bidAmountSlider.max = Math.floor(currentHighest * 1.5);
-  els.bidAmountSlider.value = currentHighest + Math.floor(basePrice * 0.05);
+  // اسلایدر از بالاترین پیشنهاد + ۱٪ شروع میشه
+  const minBid = currentHighest + Math.floor(basePrice * 0.01);
+  const maxBid = Math.floor(currentHighest * 1.5);
+  
+  els.bidAmountSlider.min = minBid;
+  els.bidAmountSlider.max = maxBid;
+  els.bidAmountSlider.value = minBid;
   els.bidAmountSlider.step = Math.floor(basePrice * 0.01);
 
-  updateBidDisplay(els.bidAmountSlider.value);
+  updateBidDisplay(minBid);
   els.bidModal.hidden = false;
 }
 
@@ -255,17 +257,17 @@ els.placeBid?.addEventListener('click', async () => {
   els.placeBid.textContent = '⏳ ثبت...';
 
   try {
-    // ۱. اگه مزایده‌ای برای این بازیکن نیست، اول بساز
     let listingId = selectedPlayerToBuy.listing_id;
     
     if (!listingId) {
+      // ساخت مزایده جدید
       const endsAt = new Date();
       endsAt.setHours(endsAt.getHours() + 10);
 
       const { data: newListing, error } = await supabase.from('transfer_listings').insert({
         player_id: selectedPlayerToBuy.id,
         seller_team_id: selectedPlayerToBuy.team_id,
-        seller_user_id: null, // ربات
+        seller_user_id: null,
         base_price: calculatePlayerValue(selectedPlayerToBuy.overall),
         current_highest_bid: amount,
         current_highest_bidder_team_id: currentTeam.id,
@@ -278,7 +280,7 @@ els.placeBid?.addEventListener('click', async () => {
       listingId = newListing.id;
       
     } else {
-      // اگه مزایده هست، فقط بالاترین رو آپدیت کن
+      // آپدیت بالاترین پیشنهاد
       await supabase.from('transfer_listings').update({
         current_highest_bid: amount,
         current_highest_bidder_team_id: currentTeam.id,
@@ -286,7 +288,7 @@ els.placeBid?.addEventListener('click', async () => {
       }).eq('id', listingId);
     }
 
-    // ۲. ثبت پیشنهاد
+    // ثبت پیشنهاد
     await supabase.from('transfer_bids').insert({
       listing_id: listingId,
       bidder_team_id: currentTeam.id,
