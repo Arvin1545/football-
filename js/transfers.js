@@ -27,6 +27,13 @@ let selectedPlayerToBuy = null;
 let currentPosFilter = 'all';
 let myBids = [];
 
+// ====================================================
+// فرمول جدید قیمت (برای اورال ۹۰ = ۲۰ میلیون)
+// ====================================================
+function calculatePlayerValue(overall) {
+  return overall * 222222;
+}
+
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
@@ -47,7 +54,6 @@ async function init() {
   await loadMyBids();
   els.loadingOverlay.hidden = true;
 
-  // تب‌ها
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -58,7 +64,6 @@ async function init() {
     });
   });
 
-  // فیلتر پست‌ها
   document.querySelectorAll('.pos-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.pos-btn').forEach(b => b.classList.remove('active'));
@@ -69,9 +74,6 @@ async function init() {
   });
 }
 
-// ====================================================
-// بازار
-// ====================================================
 async function loadMarket() {
   if (!currentTeam) {
     els.marketList.innerHTML = `<div class="empty-market"><h3>تیم ندارید</h3></div>`;
@@ -110,7 +112,7 @@ function renderMarket() {
   }
 
   els.marketList.innerHTML = filteredMarketPlayers.map(p => {
-    const price = Math.pow(p.overall, 2) * 1000;
+    const price = calculatePlayerValue(p.overall);
     return `
       <div class="market-player">
         <div class="player-avatar-small">${p.name.charAt(0)}</div>
@@ -136,15 +138,12 @@ function renderMarket() {
   });
 }
 
-// ====================================================
-// مودال پیشنهاد
-// ====================================================
 function openBidModal(playerId) {
   const player = allMarketPlayers.find(p => p.id === playerId);
   if (!player) return;
 
   selectedPlayerToBuy = player;
-  const price = Math.pow(player.overall, 2) * 1000;
+  const price = calculatePlayerValue(player.overall);
 
   els.bidAvatar.textContent = player.name.charAt(0);
   els.bidPlayerName.textContent = player.name;
@@ -193,14 +192,17 @@ els.placeBid?.addEventListener('click', async () => {
 
     if (error) throw error;
 
-    // ثبت پیشنهاد برای کاربر
-    await supabase.from('transfer_bids').insert({
-      listing_id: (await supabase.from('transfer_listings').select('id').eq('player_id', selectedPlayerToBuy.id).single()).data.id,
-      bidder_team_id: currentTeam.id,
-      bidder_user_id: currentUser.id,
-      amount: amount,
-      status: 'pending'
-    });
+    const { data: newListing } = await supabase.from('transfer_listings').select('id').eq('player_id', selectedPlayerToBuy.id).single();
+    
+    if (newListing) {
+      await supabase.from('transfer_bids').insert({
+        listing_id: newListing.id,
+        bidder_team_id: currentTeam.id,
+        bidder_user_id: currentUser.id,
+        amount: amount,
+        status: 'pending'
+      });
+    }
 
     els.bidModal.hidden = true;
     alert('✅ پیشنهاد ثبت شد!');
@@ -215,10 +217,8 @@ els.placeBid?.addEventListener('click', async () => {
   }
 });
 
-// ====================================================
-// پیشنهادهای من
-// ====================================================
 async function loadMyBids() {
+  if (!currentUser) return;
   const { data } = await supabase
     .from('transfer_bids')
     .select(`*, listing:listing_id(*, player:player_id(name, position, overall))`)
@@ -230,6 +230,8 @@ async function loadMyBids() {
 }
 
 function renderMyBids() {
+  if (!els.myBidsList) return;
+  
   if (myBids.length === 0) {
     els.myBidsList.innerHTML = `<div class="empty-market"><h3>پیشنهادی ندارید</h3></div>`;
     return;
