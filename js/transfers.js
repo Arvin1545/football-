@@ -47,7 +47,7 @@ async function init() {
     else { window.location.href = 'index.html'; return; }
   }
 
-  if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(currentUser.profile?.coins || 1000);
+  if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(currentUser.profile?.coins || 0);
 
   // ۱. چک کردن مزایده‌های تموم شده (خودکار)
   await checkExpiredListings();
@@ -78,7 +78,7 @@ async function init() {
 }
 
 // ====================================================
-// چک کردن مزایده‌های منقضی شده (انتقال خودکار)
+// چک کردن مزایده‌های منقضی شده (انتقال خودکار + برگشت پول/الماس)
 // ====================================================
 async function checkExpiredListings() {
   const now = new Date().toISOString();
@@ -93,29 +93,38 @@ async function checkExpiredListings() {
   
   for (const listing of expired) {
     if (listing.current_highest_bidder_user_id && listing.current_highest_bid > listing.base_price) {
+      // ✅ برنده داریم
+      
       // ۱. انتقال بازیکن به برنده
       await supabase.from('players').update({ team_id: listing.current_highest_bidder_team_id }).eq('id', listing.player_id);
       
-      // ۲. کم کردن پول از برنده
-      const { data: buyer } = await supabase.from('profiles').select('coins').eq('id', listing.current_highest_bidder_user_id).single();
-      if (buyer) {
-        await supabase.from('profiles').update({ coins: Math.max(0, buyer.coins - listing.current_highest_bid) }).eq('id', listing.current_highest_bidder_user_id);
-      }
-      
-      // ۳. اضافه کردن پول به فروشنده
+      // ۲. پول برنده قبلاً کم شده بود، پس فقط به فروشنده اضافه می‌کنیم
       const { data: seller } = await supabase.from('profiles').select('coins').eq('id', listing.seller_user_id).single();
       if (seller) {
         await supabase.from('profiles').update({ coins: seller.coins + listing.current_highest_bid }).eq('id', listing.seller_user_id);
       }
       
-      // ۴. آپدیت وضعیت مزایده
+      // ۳. آپدیت وضعیت
       await supabase.from('transfer_listings').update({ status: 'sold' }).eq('id', listing.id);
-      
-      // ۵. آپدیت پیشنهاد برنده
       await supabase.from('transfer_bids').update({ status: 'accepted' }).eq('listing_id', listing.id).eq('bidder_user_id', listing.current_highest_bidder_user_id);
       
+      // ۴. الماس برنده قبلاً کم شده، نیازی به کم کردن نیست.
+      
     } else {
-      // منقضی بدون فروش
+      // ❌ کسی پیشنهاد نداد یا پیشنهاد بالاتر از پایه نبود
+      
+      // ۱. اگه پیشنهادی وجود داشت، پول و الماس برنده رو برگردون
+      if (listing.current_highest_bidder_user_id) {
+        const { data: buyer } = await supabase.from('profiles').select('coins, gems').eq('id', listing.current_highest_bidder_user_id).single();
+        if (buyer) {
+          await supabase.from('profiles').update({ 
+            coins: buyer.coins + listing.current_highest_bid,
+            gems: buyer.gems + 1 // برگشت ۱ الماس (چون فعلاً همه زیر ۱۰۰ هستن)
+          }).eq('id', listing.current_highest_bidder_user_id);
+        }
+      }
+      
+      // ۲. آپدیت وضعیت
       await supabase.from('transfer_listings').update({ status: 'expired' }).eq('id', listing.id);
     }
   }
@@ -130,10 +139,12 @@ async function loadMarket() {
     return;
   }
 
+  // گرفتن تیم‌های خارج از لیگ
   const { data: otherTeams } = await supabase.from('teams').select('id').neq('league', currentTeam.league);
   if (!otherTeams) return;
   const teamIds = otherTeams.map(t => t.id);
 
+  // گرفتن بازیکنان
   const { data: players } = await supabase
     .from('players')
     .select(`*, team:team_id(name, league)`)
@@ -148,7 +159,14 @@ async function loadMarket() {
     .select('*')
     .eq('status', 'active');
 
-  // چسبوندن بالاترین پیشنهاد به هر بازیکن
+  // گرفتن بازیکنانی که تیم خودِ کاربر برای فروش گذاشته
+  const { data: myListings } = await supabase
+    .from('transfer_listings')
+    .select('*, player:player_id(*, team:team_id(name, league))')
+    .eq('status', 'active')
+    .eq('seller_team_id', currentTeam.id);
+
+  // چسبوندن بالاترین پیشنهاد
   allMarketPlayers = players.map(p => {
     const listing = listings?.find(l => l.player_id === p.id);
     return {
@@ -157,6 +175,20 @@ async function loadMarket() {
       listing_id: listing ? listing.id : null
     };
   });
+
+  // اضافه کردن بازیکنان فروشیِ خودِ کاربر به بالای لیست (برای تست)
+  if (myListings) {
+    myListings.forEach(l => {
+      if (l.player) {
+        allMarketPlayers.unshift({
+          ...l.player,
+          current_highest_bid: l.current_highest_bid,
+          listing_id: l.id,
+          is_my_player: true
+        });
+      }
+    });
+  }
 
   filterMarket();
 }
@@ -179,9 +211,10 @@ function renderMarket() {
   els.marketList.innerHTML = filteredMarketPlayers.map(p => {
     const basePrice = calculatePlayerValue(p.overall);
     const highest = p.current_highest_bid > 0 ? p.current_highest_bid : basePrice;
+    const isMine = p.is_my_player;
     
     return `
-      <div class="market-player">
+      <div class="market-player ${isMine ? 'my-player' : ''}">
         <div class="player-avatar-small">${p.name.charAt(0)}</div>
         <div class="player-main-info">
           <div class="player-main-name">${p.name}</div>
@@ -195,12 +228,14 @@ function renderMarket() {
           <div class="player-price-value">${formatMoney(highest)}</div>
           <div class="player-price-label">${p.current_highest_bid > 0 ? 'بالاترین پیشنهاد' : 'قیمت پایه'}</div>
         </div>
-        <button class="player-action-btn" data-buy="${p.id}">💰 پیشنهاد</button>
+        <button class="player-action-btn ${isMine ? 'danger' : ''}" data-buy="${p.id}" ${isMine ? 'disabled' : ''}>
+          ${isMine ? '🟡 مال شما' : '💰 پیشنهاد'}
+        </button>
       </div>
     `;
   }).join('');
 
-  els.marketList.querySelectorAll('[data-buy]').forEach(btn => {
+  els.marketList.querySelectorAll('[data-buy]:not(:disabled)').forEach(btn => {
     btn.addEventListener('click', () => openBidModal(btn.dataset.buy));
   });
 }
@@ -225,7 +260,6 @@ function openBidModal(playerId) {
     els.bidHighestPrice.textContent = player.current_highest_bid > 0 ? formatMoney(player.current_highest_bid) : 'هنوز پیشنهادی نیست';
   }
 
-  // اسلایدر از بالاترین پیشنهاد + ۱٪ شروع میشه
   const minBid = currentHighest + Math.floor(basePrice * 0.01);
   const maxBid = Math.floor(currentHighest * 1.5);
   
@@ -253,14 +287,34 @@ els.placeBid?.addEventListener('click', async () => {
   if (!selectedPlayerToBuy) return;
   const amount = parseInt(els.bidAmountSlider.value);
 
+  // ۱. چک کردن پول
+  const { data: profile } = await supabase.from('profiles').select('coins, gems').eq('id', currentUser.id).single();
+  if (!profile) return;
+
+  if (profile.coins < amount) {
+    return alert('❌ پول کافی برای این پیشنهاد ندارید!');
+  }
+
+  // ۲. چک کردن الماس
+  let gemCost = selectedPlayerToBuy.overall >= 100 ? 2 : 1;
+  if (profile.gems < gemCost) {
+    return alert(`❌ برای شرکت در این مزایده به ${gemCost} الماس نیاز دارید!`);
+  }
+
   els.placeBid.disabled = true;
   els.placeBid.textContent = '⏳ ثبت...';
 
   try {
+    // ۳. کم کردن پول و الماس از کاربر
+    await supabase.from('profiles').update({
+      coins: profile.coins - amount,
+      gems: profile.gems - gemCost
+    }).eq('id', currentUser.id);
+
     let listingId = selectedPlayerToBuy.listing_id;
     
     if (!listingId) {
-      // ساخت مزایده جدید
+      // ساخت مزایده جدید (برای بازیکنانی که صاحبشون رباته)
       const endsAt = new Date();
       endsAt.setHours(endsAt.getHours() + 10);
 
@@ -280,7 +334,7 @@ els.placeBid?.addEventListener('click', async () => {
       listingId = newListing.id;
       
     } else {
-      // آپدیت بالاترین پیشنهاد
+      // آپدیت بالاترین پیشنهاد (برای مزایده‌های موجود)
       await supabase.from('transfer_listings').update({
         current_highest_bid: amount,
         current_highest_bidder_team_id: currentTeam.id,
@@ -298,12 +352,17 @@ els.placeBid?.addEventListener('click', async () => {
     });
 
     els.bidModal.hidden = true;
-    alert('✅ پیشنهاد شما ثبت شد!');
+    alert('✅ پیشنهاد ثبت شد!');
     location.reload();
 
   } catch (error) {
     console.error(error);
     alert('خطا: ' + error.message);
+    // برگردوندن پول و الماس در صورت خطا
+    await supabase.from('profiles').update({
+      coins: profile.coins,
+      gems: profile.gems
+    }).eq('id', currentUser.id);
   } finally {
     els.placeBid.disabled = false;
     els.placeBid.textContent = '⚔️ ثبت پیشنهاد';
