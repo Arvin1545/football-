@@ -1,4 +1,4 @@
-// squad.js - کد کامل نهایی
+// squad.js - کد کامل و نهایی (بدون هیچ کم و کاستی)
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { getTeamPlayers, getOverallTier, getPositionColor, formatMoney } from './players.js';
@@ -42,20 +42,24 @@ let currentFilter = 'all';
 let selectedPlayer = null;
 let listedPlayerIds = new Set();
 
-// فرمول قیمت
+// فرمول قیمت (اورال ۹۰ = ۲۰ میلیون)
 function calculatePlayerValue(overall) {
   return overall * 222222;
 }
 
-// شروع برنامه
+// ====================================================
+// شروع
+// ====================================================
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
     currentUser = session.user;
+    // گرفتن پروفایل (سکه و الماس)
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
     if (profile) currentUser.profile = profile;
     
+    // گرفتن تیم
     const { data: team } = await supabase.from('teams').select('*').eq('taken_by', currentUser.id).maybeSingle();
     currentTeam = team;
   } else {
@@ -74,7 +78,7 @@ async function init() {
   renderSummary();
   els.loadingOverlay.hidden = true;
 
-  // رویداد فیلترها
+  // تنظیم رویداد فیلترها
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -84,7 +88,7 @@ async function init() {
     });
   });
 
-  // رویدادهای مودال
+  // تنظیم رویدادهای مودال
   els.playerModalClose?.addEventListener('click', () => els.playerModal.hidden = true);
   els.closeSellModal?.addEventListener('click', () => els.sellModal.hidden = true);
   els.cancelSellBtn?.addEventListener('click', () => els.sellModal.hidden = true);
@@ -92,7 +96,7 @@ async function init() {
   // دکمه فروش
   els.sellBtn?.addEventListener('click', openSellModal);
   
-  // اسلایدر
+  // اسلایدر قیمت
   els.sellAmountSlider?.addEventListener('input', (e) => {
     els.sellAmountDisplay.textContent = formatNumber(parseInt(e.target.value));
   });
@@ -101,7 +105,9 @@ async function init() {
   els.confirmSellBtn?.addEventListener('click', confirmSell);
 }
 
+// ====================================================
 // نمایش سکه و الماس
+// ====================================================
 function renderUserInfo() {
   const profile = currentUser?.profile || {};
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(profile.coins || 0);
@@ -124,6 +130,9 @@ async function checkListedPlayers() {
   }
 }
 
+// ====================================================
+// آمار کلی
+// ====================================================
 function renderSummary() {
   const total = allPlayers.length;
   const avg = total > 0 ? Math.round(allPlayers.reduce((s, p) => s + p.overall, 0) / total) : 0;
@@ -148,6 +157,9 @@ function applyFilter() {
   renderPlayers();
 }
 
+// ====================================================
+// نمایش کارت‌های بازیکنان
+// ====================================================
 function renderPlayers() {
   filteredPlayers = [...allPlayers].sort((a,b) => b.overall - a.overall);
 
@@ -181,6 +193,9 @@ function renderPlayers() {
   });
 }
 
+// ====================================================
+// مودال بازیکن
+// ====================================================
 function openPlayerModal(id) {
   const player = allPlayers.find(p => p.id === id);
   if (!player) return;
@@ -224,6 +239,9 @@ function openPlayerModal(id) {
   els.playerModal.hidden = false;
 }
 
+// ====================================================
+// مودال فروش (اسلایدر قیمت)
+// ====================================================
 function openSellModal() {
   if (!selectedPlayer) return;
   
@@ -243,6 +261,9 @@ function openSellModal() {
   els.sellModal.hidden = false;
 }
 
+// ====================================================
+// تایید نهایی فروش
+// ====================================================
 async function confirmSell() {
   if (!selectedPlayer) return;
   const basePrice = parseInt(els.sellAmountSlider.value);
@@ -282,6 +303,9 @@ async function confirmSell() {
   }
 }
 
+// ====================================================
+// توابع کمکی
+// ====================================================
 function getEmoji(pos) {
   if (pos === 'GK') return '🧤';
   if (['CB', 'LB', 'RB'].includes(pos)) return '🛡️';
@@ -295,4 +319,5 @@ function formatNumber(num) {
   return num;
 }
 
+// اجرای برنامه
 init();
