@@ -1,6 +1,4 @@
 // squad.js
-// منطق صفحه بازیکنان + فروش
-
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { getTeamPlayers, getOverallTier, getPositionColor, formatMoney } from './players.js';
@@ -25,7 +23,6 @@ const els = {
   playerInfoGrid: document.getElementById('playerInfoGrid'),
   sellBtn: document.getElementById('sellBtn'),
   
-  // مودال فروش
   sellModal: document.getElementById('sellModal'),
   closeSellModal: document.getElementById('closeSellModal'),
   sellAvatar: document.getElementById('sellAvatar'),
@@ -45,23 +42,25 @@ let currentFilter = 'all';
 let selectedPlayer = null;
 let listedPlayerIds = new Set();
 
-// ====================================================
-// فرمول قیمت (اورال ۹۰ = ۲۰ میلیون)
-// ====================================================
 function calculatePlayerValue(overall) {
   return overall * 222222;
 }
 
-// ====================================================
-// شروع
-// ====================================================
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
     currentUser = session.user;
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-    if (profile) currentUser.profile = profile;
+    // گرفتن پروفایل کاربر با تمام اطلاعات (سکه و الماس)
+    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+    
+    if (profile) {
+      currentUser.profile = profile;
+      console.log('✅ پروفایل لود شد. سکه:', profile.coins, 'الماس:', profile.gems);
+    } else {
+      console.error('❌ پروفایل پیدا نشد:', error);
+    }
+    
     const { data: team } = await supabase.from('teams').select('*').eq('taken_by', currentUser.id).maybeSingle();
     currentTeam = team;
   } else {
@@ -72,7 +71,9 @@ async function init() {
 
   if (!currentTeam) { window.location.href = 'league-select.html'; return; }
 
+  // نمایش اطلاعات هدر (سکه و الماس)
   renderUserInfo();
+  
   await loadPlayers();
   await checkListedPlayers();
 
@@ -102,11 +103,10 @@ async function init() {
   els.confirmSellBtn?.addEventListener('click', confirmSell);
 }
 
-// ====================================================
-// اطلاعات کاربر
-// ====================================================
 function renderUserInfo() {
-  const profile = currentUser?.profile || currentUser || {};
+  const profile = currentUser?.profile || {};
+  
+  // نمایش سکه و الماس
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(profile.coins || 0);
   if (els.gemsDisplay) els.gemsDisplay.textContent = formatNumber(profile.gems || 0);
 }
@@ -127,9 +127,6 @@ async function checkListedPlayers() {
   }
 }
 
-// ====================================================
-// آمار کلی
-// ====================================================
 function renderSummary() {
   const total = allPlayers.length;
   const avg = total > 0 ? Math.round(allPlayers.reduce((s, p) => s + p.overall, 0) / total) : 0;
@@ -154,9 +151,6 @@ function applyFilter() {
   renderPlayers();
 }
 
-// ====================================================
-// نمایش کارت‌های بازیکنان
-// ====================================================
 function renderPlayers() {
   filteredPlayers = [...allPlayers].sort((a,b) => b.overall - a.overall);
 
@@ -190,9 +184,6 @@ function renderPlayers() {
   });
 }
 
-// ====================================================
-// مودال بازیکن
-// ====================================================
 function openPlayerModal(id) {
   const player = allPlayers.find(p => p.id === id);
   if (!player) return;
@@ -236,9 +227,6 @@ function openPlayerModal(id) {
   els.playerModal.hidden = false;
 }
 
-// ====================================================
-// مودال فروش
-// ====================================================
 function openSellModal() {
   if (!selectedPlayer) return;
   
@@ -297,9 +285,6 @@ async function confirmSell() {
   }
 }
 
-// ====================================================
-// توابع کمکی
-// ====================================================
 function getEmoji(pos) {
   if (pos === 'GK') return '🧤';
   if (['CB', 'LB', 'RB'].includes(pos)) return '🛡️';
@@ -313,5 +298,4 @@ function formatNumber(num) {
   return num;
 }
 
-// شروع
 init();
