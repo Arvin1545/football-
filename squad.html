@@ -5,30 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>بازیکنان | امپراتور فوتبال</title>
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- استایل‌ها -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/game.css">
   <link rel="stylesheet" href="css/squad.css">
   <link rel="stylesheet" href="css/player-cards.css">
-  <link rel="stylesheet" href="css/transfers.css"> <!-- برای مودال فروش -->
+  <link rel="stylesheet" href="css/transfers.css">
 </head>
 <body class="game-page">
 
-  <!-- هدر -->
   <header class="game-header">
-    <a href="game.html" class="menu-btn back-btn-header">
-      <span>→</span>
-    </a>
-
+    <a href="game.html" class="menu-btn back-btn-header"><span>→</span></a>
     <div class="header-title">
       <span class="header-icon">👥</span>
       <span class="header-name">بازیکنان</span>
     </div>
-
     <div class="header-actions">
       <div class="resource-pill">
         <span>🪙</span>
@@ -41,7 +33,6 @@
     </div>
   </header>
 
-  <!-- آمار کلی تیم -->
   <section class="squad-summary">
     <div class="summary-card">
       <div class="summary-icon">👥</div>
@@ -65,31 +56,14 @@
     </div>
   </section>
 
-  <!-- فیلترها -->
   <section class="squad-filters">
-    <button class="filter-btn active" data-filter="all">
-      <span>🌐</span>
-      <span>همه</span>
-    </button>
-    <button class="filter-btn" data-filter="GK">
-      <span>🧤</span>
-      <span>GK</span>
-    </button>
-    <button class="filter-btn" data-filter="DEF">
-      <span>🛡️</span>
-      <span>مدافع</span>
-    </button>
-    <button class="filter-btn" data-filter="MID">
-      <span>⚙️</span>
-      <span>هافبک</span>
-    </button>
-    <button class="filter-btn" data-filter="ATT">
-      <span>⚽</span>
-      <span>مهاجم</span>
-    </button>
+    <button class="filter-btn active" data-filter="all"><span>🌐</span><span>همه</span></button>
+    <button class="filter-btn" data-filter="GK"><span>🧤</span><span>GK</span></button>
+    <button class="filter-btn" data-filter="DEF"><span>🛡️</span><span>مدافع</span></button>
+    <button class="filter-btn" data-filter="MID"><span>⚙️</span><span>هافبک</span></button>
+    <button class="filter-btn" data-filter="ATT"><span>⚽</span><span>مهاجم</span></button>
   </section>
 
-  <!-- لیست بازیکنان -->
   <main class="players-grid" id="playersGrid">
     <div class="loading-state">
       <div class="loader-ball">⚽</div>
@@ -128,7 +102,7 @@
     </div>
   </div>
 
-  <!-- مودال فروش (اسلایدر قیمت) -->
+  <!-- مودال فروش -->
   <div id="sellModal" class="listing-modal" hidden>
     <div class="listing-modal-content">
       <button class="close-modal-btn" id="closeSellModal">✕</button>
@@ -144,21 +118,17 @@
       <div class="listing-body">
         <div class="price-section">
           <label class="price-label">💰 قیمت پایه پیشنهادی</label>
-          
           <div class="price-display">
             <span id="sellAmountDisplay">0</span>
             <span class="currency">€</span>
           </div>
-          
           <input type="range" id="sellAmountSlider" min="0" max="100000000" step="1000000" value="10000000" class="price-slider">
-          
           <div class="price-range-labels">
             <span>کم</span>
             <span>متوسط</span>
             <span>زیاد</span>
           </div>
         </div>
-
         <div class="time-section">
           <div class="time-info">
             <span>⏰ مدت مزایده:</span>
@@ -174,7 +144,6 @@
     </div>
   </div>
 
-  <!-- لودینگ -->
   <div id="loadingOverlay" class="loading-overlay" hidden>
     <div class="loader-ball">⚽</div>
     <p>در حال بارگذاری...</p>
