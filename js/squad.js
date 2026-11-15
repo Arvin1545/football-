@@ -1,4 +1,4 @@
-// squad.js
+// squad.js - کد کامل نهایی
 import { supabase } from './supabase-client.js';
 import { getCurrentGuestProfile } from './guest.js';
 import { getTeamPlayers, getOverallTier, getPositionColor, formatMoney } from './players.js';
@@ -42,24 +42,19 @@ let currentFilter = 'all';
 let selectedPlayer = null;
 let listedPlayerIds = new Set();
 
+// فرمول قیمت
 function calculatePlayerValue(overall) {
   return overall * 222222;
 }
 
+// شروع برنامه
 async function init() {
   const { data: { session } } = await supabase.auth.getSession();
   
   if (session) {
     currentUser = session.user;
-    // گرفتن پروفایل کاربر با تمام اطلاعات (سکه و الماس)
-    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
-    
-    if (profile) {
-      currentUser.profile = profile;
-      console.log('✅ پروفایل لود شد. سکه:', profile.coins, 'الماس:', profile.gems);
-    } else {
-      console.error('❌ پروفایل پیدا نشد:', error);
-    }
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
+    if (profile) currentUser.profile = profile;
     
     const { data: team } = await supabase.from('teams').select('*').eq('taken_by', currentUser.id).maybeSingle();
     currentTeam = team;
@@ -71,9 +66,7 @@ async function init() {
 
   if (!currentTeam) { window.location.href = 'league-select.html'; return; }
 
-  // نمایش اطلاعات هدر (سکه و الماس)
   renderUserInfo();
-  
   await loadPlayers();
   await checkListedPlayers();
 
@@ -81,6 +74,7 @@ async function init() {
   renderSummary();
   els.loadingOverlay.hidden = true;
 
+  // رویداد فیلترها
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -90,23 +84,26 @@ async function init() {
     });
   });
 
+  // رویدادهای مودال
   els.playerModalClose?.addEventListener('click', () => els.playerModal.hidden = true);
   els.closeSellModal?.addEventListener('click', () => els.sellModal.hidden = true);
   els.cancelSellBtn?.addEventListener('click', () => els.sellModal.hidden = true);
   
+  // دکمه فروش
   els.sellBtn?.addEventListener('click', openSellModal);
   
+  // اسلایدر
   els.sellAmountSlider?.addEventListener('input', (e) => {
     els.sellAmountDisplay.textContent = formatNumber(parseInt(e.target.value));
   });
   
+  // دکمه تایید فروش
   els.confirmSellBtn?.addEventListener('click', confirmSell);
 }
 
+// نمایش سکه و الماس
 function renderUserInfo() {
   const profile = currentUser?.profile || {};
-  
-  // نمایش سکه و الماس
   if (els.coinsDisplay) els.coinsDisplay.textContent = formatNumber(profile.coins || 0);
   if (els.gemsDisplay) els.gemsDisplay.textContent = formatNumber(profile.gems || 0);
 }
