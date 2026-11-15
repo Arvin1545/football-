@@ -229,8 +229,8 @@ els.signupForm?.addEventListener('submit', async (e) => {
             email: fakeEmail,
             display_name: name,
             username: username,
-            coins: 1000,
-            gems: 50,
+            coins: 5000,
+            gems: 10,
             level: 1
           });
         
